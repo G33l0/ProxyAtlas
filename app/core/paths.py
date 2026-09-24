@@ -43,7 +43,7 @@ class AppPaths:
         self.database_path: Path = self.data_dir / "proxyatlas.sqlite"
         self.key_path: Path = self.data_dir / ".secret.key"
 
-    def ensure(self) -> "AppPaths":
+    def ensure(self) -> AppPaths:
         """Create all directories (idempotent)."""
         for directory in (self.data_dir, self.logs_dir, self.exports_dir, self.reports_dir):
             directory.mkdir(parents=True, exist_ok=True)

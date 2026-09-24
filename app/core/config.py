@@ -15,7 +15,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from app.core.paths import AppPaths, paths as default_paths
+from app.core.paths import AppPaths
+from app.core.paths import paths as default_paths
 
 DEFAULT_SETTINGS: dict[str, Any] = {
     "general": {
@@ -88,7 +89,7 @@ class Settings:
     _lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
 
     @classmethod
-    def load(cls, config_path: Path | None = None) -> "Settings":
+    def load(cls, config_path: Path | None = None) -> Settings:
         cfg_path = config_path or default_paths.config_path
         data: dict[str, Any] = {}
         if cfg_path.exists():

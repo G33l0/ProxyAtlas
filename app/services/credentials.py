@@ -33,7 +33,7 @@ class CredentialCipher:
         self._fernet = Fernet(key)
 
     @classmethod
-    def from_key_file(cls, key_path: Path) -> "CredentialCipher":
+    def from_key_file(cls, key_path: Path) -> CredentialCipher:
         """Load or create a key. Env override takes precedence."""
         env_secret = os.environ.get("PROXYATLAS_SECRET_KEY")
         if env_secret:

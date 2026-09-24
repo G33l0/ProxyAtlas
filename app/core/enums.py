@@ -16,7 +16,7 @@ class StrEnum(str, Enum):
         return str(self.value)
 
     @classmethod
-    def from_value(cls, value: object, default: "StrEnum | None" = None) -> "StrEnum | None":
+    def from_value(cls, value: object, default: StrEnum | None = None) -> StrEnum | None:
         """Return a member for ``value`` (case-insensitive) or ``default``."""
         if value is None:
             return default

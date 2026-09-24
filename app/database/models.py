@@ -113,13 +113,13 @@ class Proxy(Base, TimestampMixin):
     failure_count: Mapped[int] = mapped_column(Integer, default=0)
     check_count: Mapped[int] = mapped_column(Integer, default=0)
 
-    credential: Mapped["ProxyCredential | None"] = relationship(
+    credential: Mapped[ProxyCredential | None] = relationship(
         "ProxyCredential", foreign_keys=[credential_reference]
     )
-    tests: Mapped[list["ProxyTest"]] = relationship(
+    tests: Mapped[list[ProxyTest]] = relationship(
         back_populates="proxy", cascade="all, delete-orphan"
     )
-    history: Mapped[list["ProxyHistory"]] = relationship(
+    history: Mapped[list[ProxyHistory]] = relationship(
         back_populates="proxy", cascade="all, delete-orphan"
     )
 
@@ -173,7 +173,7 @@ class ProxyTest(Base):
     tested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     proxy: Mapped[Proxy] = relationship(back_populates="tests")
-    results: Mapped[list["ProxyTestResult"]] = relationship(
+    results: Mapped[list[ProxyTestResult]] = relationship(
         back_populates="test", cascade="all, delete-orphan"
     )
 

@@ -12,7 +12,7 @@ import asyncio
 import logging
 import threading
 from collections.abc import Callable, Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from app.core.enums import ValidationStatus
 from app.core.models import Endpoint, ValidationResult

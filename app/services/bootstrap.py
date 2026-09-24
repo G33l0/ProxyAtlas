@@ -12,7 +12,8 @@ import logging
 
 from app.core.config import Settings
 from app.core.logging_config import configure_logging
-from app.core.paths import AppPaths, paths as default_paths
+from app.core.paths import AppPaths
+from app.core.paths import paths as default_paths
 from app.database import repository as repo
 from app.database.engine import Database
 from app.database.migrator import run_migrations

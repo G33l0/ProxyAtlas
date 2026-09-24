@@ -182,7 +182,7 @@ async def validate_proxy(
     exit_ip: str | None = None
     working_endpoint: str | None = None
 
-    for attempt in range(samples):
+    for _attempt in range(samples):
         got_success = False
         for url in endpoints:
             try:

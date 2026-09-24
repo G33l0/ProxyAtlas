@@ -10,7 +10,6 @@ workers (see :mod:`app.workers`).
 from __future__ import annotations
 
 import html
-import json
 import statistics
 from collections import Counter
 from datetime import datetime, timezone

@@ -26,7 +26,7 @@ class AsyncWorker(QThread):
     failed = pyqtSignal(str)
     completed = pyqtSignal(object)
 
-    def __init__(self, coro_factory: Callable[["AsyncWorker"], Awaitable], parent=None) -> None:
+    def __init__(self, coro_factory: Callable[[AsyncWorker], Awaitable], parent=None) -> None:
         super().__init__(parent)
         self._coro_factory = coro_factory
         self._loop: asyncio.AbstractEventLoop | None = None

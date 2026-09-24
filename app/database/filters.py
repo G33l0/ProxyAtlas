@@ -7,7 +7,7 @@ and exports using one filter language, and allows AND/OR combination.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 from sqlalchemy import and_, or_
@@ -122,7 +122,7 @@ class FilterSpec:
     combine: str = "and"  # "and" | "or"
     search: str | None = None  # free-text across host/exit_ip/isp/country
 
-    def add(self, field_name: str, op: str, value: Any) -> "FilterSpec":
+    def add(self, field_name: str, op: str, value: Any) -> FilterSpec:
         self.conditions.append(Condition(field_name, op, value))
         return self
 
@@ -166,7 +166,7 @@ class FilterSpec:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "FilterSpec":
+    def from_dict(cls, data: dict[str, Any]) -> FilterSpec:
         conditions = [
             Condition(c["field"], c["op"], c.get("value"))
             for c in data.get("conditions", [])

@@ -8,7 +8,7 @@ stops the pipeline.
 from __future__ import annotations
 
 import abc
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from app.core.models import IntelligenceResult

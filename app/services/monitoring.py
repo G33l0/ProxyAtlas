@@ -12,7 +12,7 @@ import json
 import logging
 from dataclasses import dataclass
 
-from app.core.enums import Protocol, ValidationStatus
+from app.core.enums import Protocol
 from app.core.models import Endpoint, ProxyCandidate
 from app.database import repository as repo
 from app.database.filters import FilterSpec

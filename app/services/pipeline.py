@@ -17,10 +17,9 @@ import logging
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
-from app.core.enums import ValidationStatus
 from app.core.models import ProxyCandidate, ValidationResult
-from app.database.engine import Database
 from app.database import repository as repo
+from app.database.engine import Database
 from app.intelligence.classification import classifier
 from app.intelligence.manager import IntelligenceManager
 from app.proxy.quality import compute_quality

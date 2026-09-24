@@ -7,7 +7,7 @@ profiles which are persisted in settings.
 
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from typing import Any
 
 from app.core.enums import ValidationProfileName
@@ -32,7 +32,7 @@ class ValidationProfile:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "ValidationProfile":
+    def from_dict(cls, data: dict[str, Any]) -> ValidationProfile:
         allowed = {f for f in cls.__dataclass_fields__}
         return cls(**{k: v for k, v in data.items() if k in allowed})
 
