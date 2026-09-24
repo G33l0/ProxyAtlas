@@ -15,14 +15,25 @@ from app.core.paths import package_root
 logger = logging.getLogger(__name__)
 
 
+def _migrations_dir():
+    """Locate the migrations directory in both dev and frozen layouts."""
+    root = package_root()
+    candidates = [
+        root / "database" / "migrations",        # dev: package_root() == app/
+        root / "app" / "database" / "migrations",  # frozen: _MEIPASS/app/...
+    ]
+    for candidate in candidates:
+        if (candidate / "env.py").exists():
+            return candidate
+    return candidates[0]
+
+
 def _alembic_config(database_url: str):
     from alembic.config import Config
 
-    root = package_root().parent  # project root (has alembic.ini in dev)
-    ini_path = root / "alembic.ini"
+    ini_path = package_root().parent / "alembic.ini"
     cfg = Config(str(ini_path)) if ini_path.exists() else Config()
-    script_location = package_root() / "database" / "migrations"
-    cfg.set_main_option("script_location", str(script_location))
+    cfg.set_main_option("script_location", str(_migrations_dir()))
     cfg.set_main_option("sqlalchemy.url", database_url)
     return cfg
 
