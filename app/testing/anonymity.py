@@ -1,0 +1,67 @@
+"""Anonymity analysis based on observable HTTP behaviour.
+
+Given the headers a judge endpoint (e.g. httpbin ``/get``) echoes back, plus
+the caller's own public IP baseline, classify the proxy's anonymity. Evidence
+is recorded so the UI can explain the verdict; certainty is not claimed where
+the test cannot establish it.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from app.core.enums import Anonymity
+
+# Headers that reveal a proxy is in use.
+_PROXY_HEADERS = [
+    "via",
+    "x-forwarded-for",
+    "forwarded",
+    "x-forwarded",
+    "x-real-ip",
+    "proxy-connection",
+    "x-proxy-id",
+    "client-ip",
+]
+
+
+def analyze_anonymity(
+    echoed_headers: dict[str, str],
+    exit_ip: str | None,
+    real_ip: str | None,
+) -> tuple[Anonymity, dict[str, Any]]:
+    """Return an :class:`Anonymity` level and supporting evidence.
+
+    * ``TRANSPARENT``  — the client's real IP is exposed.
+    * ``ANONYMOUS``    — proxy headers present but real IP hidden.
+    * ``ELITE``        — no proxy headers and real IP hidden.
+    * ``UNKNOWN``      — insufficient signal.
+    """
+    normalized = {k.lower(): v for k, v in echoed_headers.items()}
+    evidence: dict[str, Any] = {"proxy_headers": [], "real_ip_leaked": False}
+
+    found_proxy_headers = [h for h in _PROXY_HEADERS if h in normalized and normalized[h]]
+    evidence["proxy_headers"] = found_proxy_headers
+
+    real_ip_leaked = False
+    if real_ip:
+        blob = " ".join(str(v) for v in normalized.values())
+        if real_ip in blob:
+            real_ip_leaked = True
+        if exit_ip and real_ip == exit_ip:
+            # Exit equals our real IP -> effectively no anonymity.
+            real_ip_leaked = True
+    evidence["real_ip_leaked"] = real_ip_leaked
+
+    if not exit_ip:
+        return Anonymity.UNKNOWN, evidence
+
+    if real_ip_leaked:
+        return Anonymity.TRANSPARENT, evidence
+    if found_proxy_headers:
+        return Anonymity.ANONYMOUS, evidence
+    if real_ip is None:
+        # We could not establish the baseline; be honest.
+        evidence["note"] = "No real-IP baseline; cannot confirm elite"
+        return Anonymity.ANONYMOUS if not found_proxy_headers else Anonymity.UNKNOWN, evidence
+    return Anonymity.ELITE, evidence
