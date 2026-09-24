@@ -34,8 +34,8 @@ def _platform_data_root() -> Path:
 class AppPaths:
     """Resolved application paths, created on demand."""
 
-    def __init__(self, root: Path | None = None) -> None:
-        self.data_dir: Path = root or _platform_data_root()
+    def __init__(self, root: Path | str | None = None) -> None:
+        self.data_dir: Path = Path(root) if root else _platform_data_root()
         self.logs_dir: Path = self.data_dir / "logs"
         self.exports_dir: Path = self.data_dir / "exports"
         self.reports_dir: Path = self.data_dir / "reports"
