@@ -66,11 +66,11 @@ def normalize_csv(
         cells = [c.strip() for c in row if c is not None]
         if not cells or cells[0].startswith("#"):
             continue
-        raw = _row_to_proxy_string(cells)
         try:
+            raw = _row_to_proxy_string(cells)
             ep = parse_proxy(raw, default_protocol)
             candidates.append(candidate_from_endpoint(ep, source))
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001 - skip header/malformed rows
             errors.append((",".join(cells), str(exc)))
     return candidates, errors
 

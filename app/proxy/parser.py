@@ -52,12 +52,18 @@ def _valid_host(host: str) -> str:
     host = host.strip()
     if not host:
         raise ParseError("Empty host")
-    # IPv6 literal (may include brackets already stripped by caller)
+    # IPv4/IPv6 literal (may include brackets already stripped by caller)
     try:
         ipaddress.ip_address(host)
         return host
     except ValueError:
         pass
+    # A dotted all-numeric token is an IP address, not a hostname — reject it
+    # if it is not a valid one (e.g. 999.999.999.999) rather than treating it
+    # as a hostname.
+    labels = host.split(".")
+    if len(labels) == 4 and all(label.isdigit() for label in labels):
+        raise ParseError(f"Invalid IPv4 address: {host!r}")
     if _HOSTNAME_RE.match(host):
         return host.lower()
     raise ParseError(f"Invalid host: {host!r}")

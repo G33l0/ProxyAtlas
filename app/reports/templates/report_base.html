@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!--
+  ProxyAtlas report base template.
+
+  The report generator (app/reports/generator.py) produces a fully self-contained
+  HTML document at runtime with the same structure and styling shown here. This
+  file documents the report layout and is bundled with the packaged application
+  so the template directory is always available for future template-driven
+  reporting.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+</head>
+<body>
+  <h1>{{ title }}</h1>
+  <div class="meta">Generated {{ generated_at }}</div>
+  <section class="cards"><!-- KPI cards: total, working, failed, success rate, avg latency --></section>
+  <section class="summary"><!-- latency & reliability stats, protocol breakdown --></section>
+  <section class="classification"><!-- classification breakdown bars --></section>
+  <section class="countries"><!-- country distribution bars --></section>
+  <section class="results"><!-- detailed results table --></section>
+</body>
+</html>
