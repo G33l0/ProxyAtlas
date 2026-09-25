@@ -40,8 +40,15 @@ def bootstrap(app_paths: AppPaths | None = None) -> AppContext:
     logger = logging.getLogger(__name__)
     logger.info("Starting ProxyAtlas bootstrap")
 
-    database_url = settings.resolved_database_url(app_paths)
-    first_run = not app_paths.database_path.exists() and database_url == app_paths.database_url
+    from app.services.storage import resolve_storage
+
+    storage = resolve_storage(settings, app_paths)
+    database_url = storage.url
+    if storage.used_fallback:
+        logger.warning(storage.message)
+    else:
+        logger.info(storage.message or "Using default database location")
+    first_run = not storage.path.exists()
 
     run_migrations(database_url)
     database = Database(database_url)
@@ -61,6 +68,8 @@ def bootstrap(app_paths: AppPaths | None = None) -> AppContext:
         discovery=discovery,
         intelligence=intelligence,
         jobs=job_manager,
+        database_path=str(storage.path),
+        storage_notice=storage.message if storage.used_fallback else "",
     )
 
     if first_run:

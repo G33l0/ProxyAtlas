@@ -27,6 +27,8 @@ class AppContext:
     discovery: DiscoveryManager
     intelligence: IntelligenceManager
     jobs: JobManager
+    database_path: str = ""
+    storage_notice: str = ""
 
     def testing_settings(self) -> dict:
         """Flattened testing settings used by the validation pipeline."""

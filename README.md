@@ -141,8 +141,11 @@ Internet Discovery module.
 
 ## Database
 
-SQLite via SQLAlchemy with Alembic migrations. Location and schema are described
-in [`docs/database.md`](docs/database.md).
+SQLite via SQLAlchemy with Alembic migrations. To keep large datasets off the
+system disk, point **Settings → Database** at an external drive or custom folder
+(with a one-click **Relocate now**); ProxyAtlas falls back to the default
+location gracefully if the drive is unavailable at launch. Location and schema
+are described in [`docs/database.md`](docs/database.md).
 
 ## Themes
 

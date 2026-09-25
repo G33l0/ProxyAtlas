@@ -4,6 +4,20 @@ All notable changes to ProxyAtlas are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/) and this project adheres to
 Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+- External-drive / custom database storage: point the database at any folder or
+  drive (Settings → Database), with a one-click relocate, writability validation
+  and graceful fallback to the default location when the drive is unavailable.
+
+### Verified
+- Real end-to-end run against a live public proxy feed (2,847 candidates →
+  validated → genuine working proxies with exit IP, geolocation, ISP,
+  classification, score and export).
+- Internet Discovery generates candidates that enter the same validation
+  pipeline with stored provenance.
+
 ## [1.0.0] - 2026-09-24
 
 ### Added
