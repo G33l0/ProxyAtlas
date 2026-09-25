@@ -132,7 +132,16 @@ def _endpoint_from_dict(rec: dict, default_protocol: Protocol) -> Endpoint:
     proto = rec.get("protocol") or rec.get("type") or default_protocol.value
     user = rec.get("username") or rec.get("user")
     pw = rec.get("password") or rec.get("pass")
-    base = f"{proto}://{host}:{port}"
+    # Build the Endpoint from validated fields directly. Reconstructing a URL
+    # string and re-parsing it would corrupt credentials that contain ':' or
+    # '@', so only host:port goes through the parser.
+    endpoint = parse_proxy(f"{proto}://{host}:{port}", default_protocol)
     if user:
-        base = f"{proto}://{user}:{pw or ''}@{host}:{port}"
-    return parse_proxy(base, default_protocol)
+        endpoint = Endpoint(
+            host=endpoint.host,
+            port=endpoint.port,
+            protocol=endpoint.protocol,
+            username=str(user),
+            password=str(pw) if pw is not None else None,
+        )
+    return endpoint

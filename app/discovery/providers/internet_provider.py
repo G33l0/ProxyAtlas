@@ -112,6 +112,13 @@ class InternetDiscoveryProvider(DiscoveryProvider):
         profile = self._config.get("profile", "default")
         source = self.name()
 
+        # ``max_candidates`` bounds the total host×port endpoints emitted, so the
+        # number of distinct hosts scanned is max_candidates / len(ports). Collect
+        # exactly that many hosts (not max_candidates hosts) to cover the intended
+        # breadth without over-collecting into memory.
+        ports_per_host = max(1, len(ports))
+        host_budget = -(-max_candidates // ports_per_host)  # ceil division
+
         hosts: list[str] = []
         for net in nets:
             for addr in net.hosts():
@@ -119,9 +126,9 @@ class InternetDiscoveryProvider(DiscoveryProvider):
                 if is_private_or_reserved(ip):
                     continue
                 hosts.append(ip)
-                if len(hosts) >= max_candidates:
+                if len(hosts) >= host_budget:
                     break
-            if len(hosts) >= max_candidates:
+            if len(hosts) >= host_budget:
                 break
 
         if shuffle:

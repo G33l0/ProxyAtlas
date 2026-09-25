@@ -59,9 +59,11 @@ class FeedProvider(DiscoveryProvider):
             text = content.decode("utf-8", errors="replace")
 
         content_type = resp.headers.get("content-type", "").lower()
+        first_line = next((ln for ln in text.splitlines() if ln.strip()), "")
+        looks_csv = "," in first_line and "://" not in first_line
         if fmt == "json" or (fmt == "auto" and "json" in content_type):
             candidates, _ = normalize_json(text, source, default_proto)
-        elif fmt == "csv" or (fmt == "auto" and ("csv" in content_type or "," in text.splitlines()[0:1] and False)):
+        elif fmt == "csv" or (fmt == "auto" and ("csv" in content_type or looks_csv)):
             candidates, _ = normalize_csv(text, source, default_proto)
         else:
             candidates, _ = normalize_lines(text.splitlines(), source, default_proto, url)
