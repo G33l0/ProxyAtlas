@@ -134,11 +134,8 @@ class Settings:
 
     # Convenience accessors used across the app -------------------------------
 
-    def resolved_database_url(self, app_paths: AppPaths) -> str:
-        custom = self.get("database", "path", "") or ""
-        if custom:
-            return f"sqlite:///{Path(custom).expanduser()}"
-        return app_paths.database_url
+    # Database location is resolved by app.services.storage.resolve_storage,
+    # which also handles external-drive validation and fallback.
 
     def resolved_reports_dir(self, app_paths: AppPaths) -> Path:
         custom = self.get("reports", "output_dir", "") or ""

@@ -142,9 +142,77 @@ class SettingsPage(BasePage):
         f.addRow("Enable ip-api.com", self._combo("providers.ip-api.enabled", ["true", "false"], str(ipapi.get("enabled", True)).lower()))
 
     def _build_database(self):
+        from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget
+
         f = self._tab("Database")
-        f.addRow("Database path (blank = default)", self._line("database.path", self._get("database", "path", "")))
+
+        # Current effective location (read-only info).
+        current = QLabel(getattr(self.ctx, "database_path", "") or "default location")
+        current.setObjectName("StatLabel")
+        current.setWordWrap(True)
+        f.addRow("Current database", current)
+
+        # Custom path with folder/file browse (supports external drives).
+        path_edit = self._line("database.path", self._get("database", "path", ""))
+        row = QWidget()
+        rl = QHBoxLayout(row)
+        rl.setContentsMargins(0, 0, 0, 0)
+        rl.addWidget(path_edit)
+        browse_dir = QPushButton("Folder…")
+        browse_dir.clicked.connect(lambda: self._browse_db_folder(path_edit))
+        browse_file = QPushButton("File…")
+        browse_file.clicked.connect(lambda: self._browse_db_file(path_edit))
+        rl.addWidget(browse_dir)
+        rl.addWidget(browse_file)
+        f.addRow("Database path (blank = default)", row)
+
+        hint = QLabel(
+            "Point this at an external drive or any folder to keep the database "
+            "off the system disk. If the drive is unavailable at launch, "
+            "ProxyAtlas falls back to the default location."
+        )
+        hint.setObjectName("StatLabel")
+        hint.setWordWrap(True)
+        f.addRow("", hint)
+
+        relocate = QPushButton("Relocate database to this path now")
+        relocate.clicked.connect(lambda: self._relocate_database(path_edit))
+        f.addRow("", relocate)
+
         f.addRow("Batch size", self._spin("database.batch_size", self._get("database", "batch_size", 500), 50, 10000))
+
+    def _browse_db_folder(self, edit) -> None:
+        from PyQt6.QtWidgets import QFileDialog
+
+        folder = QFileDialog.getExistingDirectory(self, "Select database folder (e.g. external drive)")
+        if folder:
+            edit.setText(folder)
+
+    def _browse_db_file(self, edit) -> None:
+        from PyQt6.QtWidgets import QFileDialog
+
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Select database file", "proxyatlas.sqlite", "SQLite (*.sqlite *.db);;All files (*)"
+        )
+        if path:
+            edit.setText(path)
+
+    def _relocate_database(self, edit) -> None:
+        from pathlib import Path
+
+        from app.services.storage import relocate_database, validate_db_location
+
+        dest = edit.text().strip()
+        if not dest:
+            self.toast("Enter or browse to a destination path first", "warning")
+            return
+        ok, msg = validate_db_location(dest)
+        if not ok:
+            self.toast(msg, "error")
+            return
+        current = Path(getattr(self.ctx, "database_path", "") or self.ctx.paths.database_path)
+        ok, msg = relocate_database(current, dest, self.ctx.settings)
+        self.toast(msg, "success" if ok else "error")
 
     def _build_reports(self):
         f = self._tab("Reports")

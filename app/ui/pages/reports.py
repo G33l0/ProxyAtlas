@@ -68,7 +68,11 @@ class ReportsPage(BasePage):
     def _generate(self, as_report: bool) -> None:
         base = self.filter_combo.currentData()
         spec = FilterSpec.from_dict(base.to_dict())
-        dlg = ExportDialog(self, default_dir=str(self.ctx.paths.reports_dir if as_report else self.ctx.paths.exports_dir), as_report=as_report)
+        if as_report:
+            default_dir = str(self.ctx.settings.resolved_reports_dir(self.ctx.paths))
+        else:
+            default_dir = str(self.ctx.paths.exports_dir)
+        dlg = ExportDialog(self, default_dir=default_dir, as_report=as_report)
         if dlg.exec() != ExportDialog.DialogCode.Accepted:
             return
         opts = dlg.options()

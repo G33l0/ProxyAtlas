@@ -14,6 +14,20 @@ By default the database lives in the per-user data directory:
 Override the whole data directory with `PROXYATLAS_DATA_DIR`, or set a custom
 database path under **Settings → Database**.
 
+### External drives / custom storage
+
+To keep large proxy datasets off the system disk, point **Settings → Database →
+Database path** at an external drive or any folder (use the **Folder…** or
+**File…** picker). The value may be a directory (the `proxyatlas.sqlite` file
+name is appended) or a full `*.sqlite` file path.
+
+- **Relocate now** copies the current database (and its WAL/SHM sidecars) to the
+  chosen location and updates the setting; restart to use the new file.
+- **Graceful fallback**: if the configured location is unavailable at launch
+  (e.g. the external drive is unplugged), ProxyAtlas logs a warning, shows a
+  notice, and falls back to the default location instead of crashing.
+- Writability is validated before use (`app/services/storage.py`).
+
 ## Engine tuning
 
 SQLite connections are configured with WAL journaling, `foreign_keys=ON`,

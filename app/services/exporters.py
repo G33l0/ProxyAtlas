@@ -49,16 +49,18 @@ def export_txt(
     line_format: str = "ip_port",
     working_only: bool = True,
 ) -> int:
-    """Write TXT. ``line_format`` is 'ip_port', 'protocol_url', or 'full_url'."""
+    """Write TXT. ``line_format`` is 'ip_port' or 'protocol_url'.
+
+    Credentials are intentionally never written to exports (see SECURITY.md);
+    exported rows carry only the endpoint identity.
+    """
     rows = _only_working(list(rows), working_only)
     lines: list[str] = []
     for r in rows:
         host, port, proto = r.get("host"), r.get("port"), r.get("protocol")
         if line_format == "protocol_url":
             lines.append(f"{proto}://{host}:{port}")
-        elif line_format == "full_url":
-            lines.append(f"{proto}://{host}:{port}")
-        else:  # ip_port
+        else:  # ip_port (default)
             lines.append(f"{host}:{port}")
     text = "\n".join(lines) + ("\n" if lines else "")
     Path(path).write_text(text, encoding="utf-8")

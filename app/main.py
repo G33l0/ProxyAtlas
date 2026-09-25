@@ -11,6 +11,8 @@ def main() -> int:
     """Launch the ProxyAtlas desktop application."""
     from PyQt6.QtWidgets import QApplication
 
+    from app.services.bootstrap import is_database_empty
+
     ctx = bootstrap()
 
     app = QApplication(sys.argv)
@@ -24,10 +26,11 @@ def main() -> int:
     window = MainWindow(ctx)
     window.show()
 
+    # Warn if a configured external/custom database location was unavailable.
+    if ctx.storage_notice:
+        window.toast(ctx.storage_notice, "warning")
     # Onboarding hint if the database is empty.
-    from app.services.bootstrap import is_database_empty
-
-    if is_database_empty(ctx):
+    elif is_database_empty(ctx):
         window.toast("Welcome to ProxyAtlas! Import a list or run discovery to begin.", "info")
 
     return app.exec()

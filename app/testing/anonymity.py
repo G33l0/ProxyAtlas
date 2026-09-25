@@ -8,6 +8,7 @@ the test cannot establish it.
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from app.core.enums import Anonymity
@@ -45,8 +46,12 @@ def analyze_anonymity(
 
     real_ip_leaked = False
     if real_ip:
+        # Tokenize header values on non-IP characters so we match the real IP as
+        # a whole address, not as a substring of an unrelated value (e.g.
+        # '11.2.3.44' must not match '1.2.3.4').
         blob = " ".join(str(v) for v in normalized.values())
-        if real_ip in blob:
+        tokens = set(re.split(r"[^0-9a-fA-F:.]+", blob))
+        if real_ip in tokens:
             real_ip_leaked = True
         if exit_ip and real_ip == exit_ip:
             # Exit equals our real IP -> effectively no anonymity.

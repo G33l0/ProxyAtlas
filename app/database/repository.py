@@ -16,7 +16,7 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.core.enums import Classification, Protocol, ValidationStatus
+from app.core.enums import Anonymity, Classification, DnsStatus, Protocol, ValidationStatus
 from app.core.models import (
     ClassificationResult,
     Endpoint,
@@ -131,8 +131,13 @@ def apply_validation_result(
         proxy.latency = round(result.latency_ms, 2)
     if result.connect_time_ms is not None:
         proxy.connect_latency = round(result.connect_time_ms, 2)
-    proxy.anonymity = result.anonymity.value
-    proxy.dns_status = result.dns_status.value
+    # Only overwrite anonymity/DNS when this run actually produced a signal, so a
+    # lighter re-check (Quick/Standard) or a failure never wipes a prior deep
+    # determination.
+    if result.anonymity != Anonymity.UNKNOWN:
+        proxy.anonymity = result.anonymity.value
+    if result.dns_status != DnsStatus.UNTESTED:
+        proxy.dns_status = result.dns_status.value
 
     if result.ok:
         proxy.success_count = (proxy.success_count or 0) + 1
