@@ -108,9 +108,9 @@ class ProxiesPage(BasePage):
         footer = QHBoxLayout()
         self.count_label = QLabel("0 proxies")
         self.count_label.setObjectName("StatLabel")
-        self.prev_btn = QPushButton("‹ Prev")
+        self.prev_btn = QPushButton("< Prev")
         self.prev_btn.clicked.connect(self._prev_page)
-        self.next_btn = QPushButton("Next ›")
+        self.next_btn = QPushButton("Next >")
         self.next_btn.clicked.connect(self._next_page)
         self.page_label = QLabel("Page 1")
         self.page_label.setObjectName("StatLabel")
@@ -237,9 +237,9 @@ class ProxiesPage(BasePage):
         act_copy.triggered.connect(self._copy_endpoints)
         act_retest = QAction("Re-test Selected", self)
         act_retest.triggered.connect(self._retest_selected)
-        act_tag = QAction("Add Tag…", self)
+        act_tag = QAction("Add Tag...", self)
         act_tag.triggered.connect(self._add_tag)
-        act_export = QAction("Export Selected…", self)
+        act_export = QAction("Export Selected...", self)
         act_export.triggered.connect(lambda: self._export(selected_only=True))
         act_delete = QAction("Delete Selected", self)
         act_delete.triggered.connect(self._delete_selected)
@@ -309,7 +309,7 @@ class ProxiesPage(BasePage):
         worker.failed.connect(lambda e: self.toast(f"Re-test failed: {e}", "error"))
         self._workers.append(worker)
         worker.start()
-        self.toast(f"Re-testing {len(candidates)} prox{'y' if len(candidates)==1 else 'ies'}…", "info")
+        self.toast(f"Re-testing {len(candidates)} prox{'y' if len(candidates)==1 else 'ies'}...", "info")
 
     def _retest_done(self, res, worker) -> None:
         self.toast(f"Re-test complete: {res.working} working / {res.total}", "success")
@@ -342,7 +342,7 @@ class ProxiesPage(BasePage):
         worker.failed.connect(lambda e: self.toast(f"Export failed: {e}", "error"))
         self._workers.append(worker)
         worker.start()
-        self.toast("Exporting…", "info")
+        self.toast("Exporting...", "info")
 
     def _export_selected_rows(self, opts: dict) -> None:
         from app.services.exporters import export_rows, proxy_to_row
@@ -363,7 +363,7 @@ class ProxiesPage(BasePage):
             self.toast(f"Export failed: {exc}", "error")
 
     def _export_done(self, info: dict, worker) -> None:
-        self.toast(f"Exported {info['count']} proxies → {info['path']}", "success")
+        self.toast(f"Exported {info['count']} proxies -> {info['path']}", "success")
         if worker in self._workers:
             self._workers.remove(worker)
 

@@ -63,7 +63,7 @@ class ProxyDetailsDialog(QDialog):
         form.setSpacing(8)
 
         def add(label: str, value) -> None:
-            form.addRow(label, QLabel("—" if value in (None, "") else str(value)))
+            form.addRow(label, QLabel("-" if value in (None, "") else str(value)))
 
         status = STATUS_LABELS.get(ValidationStatus.from_value(data.get("status"), ValidationStatus.UNKNOWN), data.get("status"))
         cls = CLASSIFICATION_LABELS.get(Classification.from_value(data.get("classification"), Classification.UNKNOWN), data.get("classification"))
@@ -124,7 +124,7 @@ class ProxyDetailsDialog(QDialog):
             try:
                 items = json.loads(evidence)
                 for e in items:
-                    layout.addWidget(QLabel(f"• {e}"))
+                    layout.addWidget(QLabel(f"- {e}"))
             except (json.JSONDecodeError, ValueError):
                 layout.addWidget(QLabel(str(evidence)))
         else:
@@ -151,7 +151,7 @@ class ProxyDetailsDialog(QDialog):
             table.setItem(r, 0, QTableWidgetItem(t.tested_at.strftime("%Y-%m-%d %H:%M") if t.tested_at else ""))
             table.setItem(r, 1, QTableWidgetItem(t.profile))
             table.setItem(r, 2, QTableWidgetItem(t.status))
-            table.setItem(r, 3, QTableWidgetItem(f"{t.response_time_ms:.0f}" if t.response_time_ms else "—"))
+            table.setItem(r, 3, QTableWidgetItem(f"{t.response_time_ms:.0f}" if t.response_time_ms else "-"))
             table.setItem(r, 4, QTableWidgetItem(t.error_detail or ""))
         table.resizeColumnsToContents()
         return table

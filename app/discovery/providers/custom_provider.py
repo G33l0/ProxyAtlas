@@ -1,10 +1,6 @@
-"""Custom provider plugin loader.
-
-Enables future/third-party discovery sources without modifying the core engine.
-A custom provider is a Python module placed in ``future_providers/`` (or an
-importable path) exposing a ``build(config) -> DiscoveryProvider`` factory or a
-``PROVIDER`` class. This module also offers an inline provider that yields
-candidates from an explicit list, useful for scripting and tests.
+"""Loads a third-party discovery provider: a module (in future_providers/ or
+importable) exposing build(config) or a PROVIDER class. Also has an inline
+list provider handy for scripts and tests.
 """
 
 from __future__ import annotations

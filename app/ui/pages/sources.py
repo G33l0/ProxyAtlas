@@ -74,8 +74,8 @@ class SourcesPage(BasePage):
             self.table.setItem(i, 1, QTableWidgetItem(provider))
             self.table.setItem(i, 2, QTableWidgetItem(stype))
             self.table.setItem(i, 3, QTableWidgetItem("Yes" if enabled else "No"))
-            self.table.setItem(i, 4, QTableWidgetItem(last_run.strftime("%Y-%m-%d %H:%M") if last_run else "—"))
-            self.table.setItem(i, 5, QTableWidgetItem(f"{last_status or '—'} ({last_count})"))
+            self.table.setItem(i, 4, QTableWidgetItem(last_run.strftime("%Y-%m-%d %H:%M") if last_run else "-"))
+            self.table.setItem(i, 5, QTableWidgetItem(f"{last_status or '-'} ({last_count})"))
         self.stack.setCurrentWidget(self.empty if not rows else self.stack.widget(0))
 
     def _selected(self):
@@ -143,7 +143,7 @@ class SourcesPage(BasePage):
         worker.completed.connect(lambda out: self._run_done(out, src.id, worker))
         worker.failed.connect(lambda e: self._run_failed(e, src.id, worker))
         self._workers.append(worker)
-        self.toast(f"Running source '{src.name}'…", "info")
+        self.toast(f"Running source '{src.name}'...", "info")
         worker.start()
 
     def _run_done(self, out, sid, worker) -> None:

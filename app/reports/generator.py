@@ -1,10 +1,6 @@
-"""Professional HTML report generation.
-
-Builds a self-contained, theme-styled HTML report with discovery/validation
-summaries, classification/protocol/country breakdowns, latency and reliability
-statistics, and a detailed results table. All dynamic content is HTML-escaped
-to prevent injection from proxy/provider strings. Reports run in background
-workers (see :mod:`app.workers`).
+"""Builds a standalone HTML report: summary cards, classification/protocol/
+country breakdowns, latency and reliability stats, and a results table. Every
+dynamic value is HTML-escaped. Runs in a worker.
 """
 
 from __future__ import annotations
@@ -52,9 +48,9 @@ def build_report_html(rows: list[dict[str, Any]], title: str = "ProxyAtlas Repor
         if not values:
             return '<span class="muted">n/a</span>'
         return (
-            f"min {min(values):.0f}{unit} · "
-            f"avg {statistics.mean(values):.0f}{unit} · "
-            f"median {statistics.median(values):.0f}{unit} · "
+            f"min {min(values):.0f}{unit} / "
+            f"avg {statistics.mean(values):.0f}{unit} / "
+            f"median {statistics.median(values):.0f}{unit} / "
             f"max {max(values):.0f}{unit}"
         )
 

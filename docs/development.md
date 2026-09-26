@@ -18,7 +18,7 @@ discovery, testing, intelligence, services) is Qt-free and unit-testable; the
 
 - Type hints on public functions; docstrings on public interfaces.
 - Structured exceptions from `app/core/exceptions.py`.
-- No blocking network/DB work on the Qt GUI thread — use the async engines and
+- No blocking network/DB work on the Qt GUI thread - use the async engines and
   Qt workers.
 - No hard-coded credentials or demonstration proxy records.
 - Keep modules focused and reasonably sized.

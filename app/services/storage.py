@@ -1,12 +1,7 @@
-"""Database storage location management (incl. external drives).
-
-ProxyAtlas can keep its SQLite database on an external drive or any custom
-folder so the machine's system disk isn't consumed by large proxy datasets.
-This module resolves and validates that location, falls back gracefully when an
-external drive is not mounted, and can relocate an existing database.
-
-A custom database path may be given as a directory (the DB file name is
-appended) or a full ``*.sqlite`` file path.
+"""Works out where the SQLite DB lives, so it can sit on an external drive or
+any folder instead of the system disk. Falls back to the default when the
+configured path isn't reachable, and can move an existing DB. A custom path can
+be a directory (we append the filename) or a full .sqlite path.
 """
 
 from __future__ import annotations
@@ -38,7 +33,7 @@ class ResolvedStorage:
 
 
 def normalize_db_path(raw: str) -> Path:
-    """Turn a user-provided path into a concrete ``*.sqlite`` file path.
+    """Turn a user-provided path into a concrete `*.sqlite` file path.
 
     A directory (existing, or ending with a separator, or extension-less)
     receives the default DB filename; a file path is used as-is.
@@ -52,8 +47,8 @@ def normalize_db_path(raw: str) -> Path:
 def validate_db_location(raw: str) -> tuple[bool, str]:
     """Check whether a custom DB location is usable (parent writable).
 
-    Returns ``(ok, message)``. Does not create the database, only verifies the
-    target directory exists (or can be created) and is writable — the key check
+    Returns `(ok, message)`. Does not create the database, only verifies the
+    target directory exists (or can be created) and is writable - the key check
     for an external drive that may be unmounted.
     """
     if not raw or not raw.strip():
@@ -74,7 +69,7 @@ def validate_db_location(raw: str) -> tuple[bool, str]:
         except OSError as exc:
             return False, f"Folder is not writable: {exc}"
         return True, f"Database will be stored at {db_path}"
-    except Exception as exc:  # noqa: BLE001 - defensive
+    except Exception as exc:  # noqa: BLE001
         return False, f"Invalid path: {exc}"
 
 
@@ -82,8 +77,8 @@ def resolve_storage(settings: Settings, app_paths: AppPaths) -> ResolvedStorage:
     """Resolve the database location, falling back to default if unusable.
 
     A configured external/custom path that is currently unavailable (e.g. the
-    drive is unplugged) does not crash startup — the app falls back to the
-    default location and reports it via ``ResolvedStorage.message``.
+    drive is unplugged) does not crash startup - the app falls back to the
+    default location and reports it via `ResolvedStorage.message`.
     """
     custom = (settings.get("database", "path", "") or "").strip()
     if not custom:
@@ -118,9 +113,9 @@ def relocate_database(
 ) -> tuple[bool, str]:
     """Copy an existing database (and WAL/SHM sidecars) to a new location.
 
-    Updates the ``database.path`` setting on success. The application must
+    Updates the `database.path` setting on success. The application must
     reopen the database (typically on restart) for the change to take effect.
-    Returns ``(ok, message)``.
+    Returns `(ok, message)`.
     """
     ok, message = validate_db_location(destination_raw)
     if not ok:

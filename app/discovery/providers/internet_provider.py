@@ -1,14 +1,7 @@
-"""Internet Discovery provider.
-
-Generates proxy *candidates* across user-configured, authorized/publicly
-intended address space (explicit CIDR ranges) combined with a configurable list
-of common proxy ports. It performs **no validation** itself — every candidate
-enters the standard validation pipeline like any other source. Generation is
-bounded by ``max_candidates`` to keep jobs controlled, and reserved/private
-ranges are skipped.
-
-This is deliberately implemented as a provider/module so additional discovery
-techniques can be added later without touching the core engine.
+"""Generates candidates from configured CIDR ranges crossed with common proxy
+ports. It doesn't validate anything itself; the candidates go through the normal
+pipeline. Capped by max_candidates, private/reserved ranges skipped. It's a
+provider so other discovery techniques can be dropped in later.
 """
 
 from __future__ import annotations
@@ -112,7 +105,7 @@ class InternetDiscoveryProvider(DiscoveryProvider):
         profile = self._config.get("profile", "default")
         source = self.name()
 
-        # ``max_candidates`` bounds the total host×port endpoints emitted, so the
+        # `max_candidates` bounds the total host x port endpoints emitted, so the
         # number of distinct hosts scanned is max_candidates / len(ports). Collect
         # exactly that many hosts (not max_candidates hosts) to cover the intended
         # breadth without over-collecting into memory.

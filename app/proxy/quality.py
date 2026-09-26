@@ -1,13 +1,6 @@
-"""Explainable proxy quality scoring.
-
-Produces a 0-100 composite :class:`QualityScore` from weighted components so the
-UI can show exactly how a score was built:
-
-* connectivity — did the last validation succeed
-* latency      — faster is better (log-scaled)
-* reliability  — success rate over samples/history
-* stability    — consistency of recent outcomes
-* freshness    — how recently it was confirmed working
+"""0-100 quality score from weighted parts the UI can show individually:
+connectivity (did it work), latency (log-scaled), reliability (success rate),
+stability (recent consistency) and freshness (how recently it worked).
 """
 
 from __future__ import annotations

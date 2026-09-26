@@ -1,8 +1,6 @@
-"""Lightweight interval scheduler for recurring discovery/monitoring.
-
-Kept framework-agnostic: it computes due items based on ``last_run`` and an
-interval. The actual triggering is done by the services layer / Qt timers so
-this module stays testable without a running loop.
+"""Works out which recurring items are due from last_run + interval. It only
+decides; the services layer / a Qt timer does the firing, which keeps this
+testable without a loop.
 """
 
 from __future__ import annotations

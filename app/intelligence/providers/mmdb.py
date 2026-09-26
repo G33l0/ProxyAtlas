@@ -1,15 +1,8 @@
-"""Offline GeoIP intelligence provider backed by MaxMind/DB-IP ``.mmdb`` files.
-
-Uses local MMDB databases (GeoLite2-City / GeoLite2-Country and GeoLite2-ASN, or
-the equivalent DB-IP Lite files) so geolocation, ASN and ISP resolution work
-without any network calls or rate limits. ProxyAtlas does not bundle these
-licensed databases — the user supplies the file paths under
-Settings → Providers. When ``geoip2`` is not installed or no database is
-configured, the provider simply returns an empty result and the pipeline falls
-back to the online providers.
-
-Runs at the highest priority so, when present, it answers first and the network
-providers only fill any gaps.
+"""Offline GeoIP from local .mmdb files (GeoLite2 or DB-IP city + ASN). No
+network, no rate limits. We don't ship the databases (they're licensed); the
+user points at them in Settings > Providers. No geoip2 or no file just means an
+empty result and we fall back to the online providers. Highest priority, so when
+a DB is present it answers first.
 """
 
 from __future__ import annotations
@@ -85,7 +78,7 @@ class MmdbProvider(IntelligenceProvider):
             if asn and Path(asn).expanduser().exists():
                 self._asn_reader = geoip2.database.Reader(str(Path(asn).expanduser()))
             self._available = bool(self._city_reader or self._asn_reader)
-        except Exception as exc:  # noqa: BLE001 - bad file, wrong format, etc.
+        except Exception as exc:  # noqa: BLE001
             logger.warning("Failed to open MMDB database: %s", exc)
             self._available = False
 
@@ -100,7 +93,7 @@ class MmdbProvider(IntelligenceProvider):
         if self._city_reader is not None:
             try:
                 self._read_city(ip, result)
-            except Exception:  # noqa: BLE001 - address not in DB / lookup error
+            except Exception:  # noqa: BLE001
                 pass
         if self._asn_reader is not None:
             try:

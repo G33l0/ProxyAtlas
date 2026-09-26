@@ -1,4 +1,4 @@
-"""Validation worker — runs the processing pipeline in the background."""
+"""Validation worker - runs the processing pipeline in the background."""
 
 from __future__ import annotations
 

@@ -1,9 +1,6 @@
-"""Export working/filtered proxies to TXT, CSV, JSON and HTML.
-
-Exporters operate on plain dict rows (decoupled from ORM). The TXT exporter
-supports configurable line formats. When the caller requests WORKING results
-only, non-working proxies are excluded by the query, not here — but a safety
-filter is applied regardless so failed proxies never leak into a WORKING export.
+"""Export proxies to TXT/CSV/JSON/HTML. Works on plain dict rows, not ORM
+objects. working_only re-filters here too, so a failed proxy can't slip into a
+WORKING export even if the query already filtered.
 """
 
 from __future__ import annotations
@@ -32,8 +29,8 @@ CREDENTIAL_COLUMNS = ["username", "password"]
 def proxy_to_row(proxy: Any, cipher: Any = None, include_credentials: bool = False) -> dict[str, Any]:
     """Convert a Proxy ORM object to a serializable dict.
 
-    Credentials are included only when ``include_credentials`` is True *and* a
-    ``cipher`` is supplied to decrypt them — an explicit, opt-in action. By
+    Credentials are included only when `include_credentials` is True *and* a
+    `cipher` is supplied to decrypt them - an explicit, opt-in action. By
     default no credentials are written (see SECURITY.md).
     """
     def val(name: str) -> Any:
@@ -50,7 +47,7 @@ def proxy_to_row(proxy: Any, cipher: Any = None, include_credentials: bool = Fal
             if cred is not None:
                 row["username"] = cipher.decrypt(cred.username_enc)
                 row["password"] = cipher.decrypt(cred.password_enc)
-        except Exception:  # noqa: BLE001 - never fail an export over creds
+        except Exception:  # noqa: BLE001
             row["username"] = None
             row["password"] = None
     return row
@@ -68,7 +65,7 @@ def export_txt(
     line_format: str = "ip_port",
     working_only: bool = True,
 ) -> int:
-    """Write TXT. ``line_format`` is 'ip_port' or 'protocol_url'.
+    """Write TXT. `line_format` is 'ip_port' or 'protocol_url'.
 
     Credentials are intentionally never written to exports (see SECURITY.md);
     exported rows carry only the endpoint identity.
@@ -153,7 +150,7 @@ tr:nth-child(even){{background:#111827}}
 .meta{{color:#94a3b8;margin-bottom:12px}}
 </style></head><body>
 <h1>{html.escape(title)}</h1>
-<div class="meta">Generated {generated} · {len(rows)} proxies</div>
+<div class="meta">Generated {generated} / {len(rows)} proxies</div>
 <table><thead><tr>{head_cells}</tr></thead><tbody>{''.join(body_rows)}</tbody></table>
 </body></html>"""
     Path(path).write_text(doc, encoding="utf-8")

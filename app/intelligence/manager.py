@@ -1,8 +1,6 @@
-"""Intelligence manager: runs providers and merges results.
-
-Providers are executed in priority order; each is isolated so a failure only
-records a provider error and never stops the lookup. Non-empty fields from
-earlier (higher priority) providers win; later providers fill gaps.
+"""Runs the intelligence providers in priority order and merges their output.
+Earlier providers win on non-empty fields, later ones fill gaps, and a provider
+that throws just records an error.
 """
 
 from __future__ import annotations
@@ -82,7 +80,7 @@ class IntelligenceManager:
                 if st:
                     st.last_success = datetime.now(timezone.utc).isoformat(timespec="seconds")
                     st.last_error = None
-            except Exception as exc:  # noqa: BLE001 - provider isolation
+            except Exception as exc:  # noqa: BLE001
                 logger.warning("Intelligence provider %s failed: %s", provider.name(), exc)
                 if st:
                     st.last_error = str(exc)[:200]

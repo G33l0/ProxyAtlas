@@ -1,13 +1,7 @@
-"""SQLAlchemy ORM models for ProxyAtlas.
-
-The schema is normalized around a canonical :class:`Proxy` row (one per
-``protocol://host:port`` identity) with satellite tables for credentials,
-tests, history, monitoring, sources, jobs, geolocation, network identity,
-exports, settings and an audit log.
-
-All models use SQLAlchemy 2.0 typed declarative mapping. Timestamps are stored
-timezone-aware in UTC. Indexes and a unique constraint on endpoint identity
-prevent duplicate proxies.
+"""ORM models. One canonical Proxy row per protocol://host:port, with side
+tables for credentials, tests, history, monitoring, sources, jobs, geo, network
+identity, exports, settings and the audit log. SQLAlchemy 2.0 typed mapping,
+UTC timestamps, unique constraint on the endpoint so proxies can't duplicate.
 """
 
 from __future__ import annotations
@@ -179,7 +173,7 @@ class ProxyTest(Base):
 
 
 class ProxyTestResult(Base):
-    """A granular metric/result belonging to a :class:`ProxyTest`."""
+    """A granular metric/result belonging to a `ProxyTest`."""
 
     __tablename__ = "proxy_test_results"
 

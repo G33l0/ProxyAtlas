@@ -1,9 +1,6 @@
-"""Monitoring service.
-
-Re-validates monitored targets (a saved collection filter, an ad-hoc filter, or
-individual proxies) on a schedule, recording availability/latency snapshots and
-updating each proxy's live status. Uses the same validation pipeline as
-everything else.
+"""Re-validates a monitored target (a collection filter, an ad-hoc filter, or
+specific proxies) and records an availability/latency snapshot. Same pipeline
+as everything else.
 """
 
 from __future__ import annotations
@@ -79,7 +76,7 @@ async def run_monitor_once(ctx: AppContext, job_id: int, target_type: str, targe
     )
     try:
         result = await pipeline.process(candidates, profile)
-    except Exception as exc:  # noqa: BLE001 - a failed pass must still advance the schedule
+    except Exception as exc:  # noqa: BLE001
         logger.warning("Monitor job %s failed: %s", job_id, exc)
         # Record an empty result so next_run_at advances and the scheduler does
         # not re-fire this job every tick.

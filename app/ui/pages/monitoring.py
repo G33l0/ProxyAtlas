@@ -105,8 +105,8 @@ class MonitoringPage(BasePage):
             self.table.setItem(i, 0, self._item(j.name, j.id))
             self.table.setItem(i, 1, QTableWidgetItem(j.target_type))
             self.table.setItem(i, 2, QTableWidgetItem(f"{j.interval_minutes} min"))
-            self.table.setItem(i, 3, QTableWidgetItem(j.last_run_at.strftime("%Y-%m-%d %H:%M") if j.last_run_at else "—"))
-            self.table.setItem(i, 4, QTableWidgetItem(f"{last.working}/{last.total} working" if last else "—"))
+            self.table.setItem(i, 3, QTableWidgetItem(j.last_run_at.strftime("%Y-%m-%d %H:%M") if j.last_run_at else "-"))
+            self.table.setItem(i, 4, QTableWidgetItem(f"{last.working}/{last.total} working" if last else "-"))
         self.stack.setCurrentWidget(self.empty if not rows else self.stack.widget(0))
 
     def _item(self, text, jid):
@@ -160,7 +160,7 @@ class MonitoringPage(BasePage):
         worker.completed.connect(lambda out: self._run_done(out, worker))
         worker.failed.connect(lambda e: self.toast(f"Monitor failed: {e}", "error"))
         self._workers.append(worker)
-        self.toast("Running monitor…", "info")
+        self.toast("Running monitor...", "info")
         worker.start()
 
     def _run_done(self, outcome, worker) -> None:

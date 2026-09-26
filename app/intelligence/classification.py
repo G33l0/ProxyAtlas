@@ -1,9 +1,6 @@
-"""Evidence-based proxy classification.
-
-Classification is derived from concrete signals (hosting flags, ASN/ISP/org
-keywords, mobile flags, reverse-DNS) — never from a naive "not datacenter =
-residential" fallback. When evidence is weak the result is ``UNKNOWN`` with a
-low confidence, and every decision records its supporting evidence.
+"""Classify a proxy from real signals (hosting flags, ASN/ISP/org keywords,
+mobile flag, reverse DNS). Weak evidence gives UNKNOWN with low confidence.
+There's no "not datacenter therefore residential" shortcut.
 """
 
 from __future__ import annotations
@@ -62,7 +59,7 @@ class NetworkClassifier:
             scores[Classification.DATACENTER] = max(scores.get(Classification.DATACENTER, 0), 0.75)
             result.add_evidence(f"Datacenter keywords: {', '.join(dc)}")
 
-        # ISP (consumer broadband) — strong signal of residential-capable ISP.
+        # ISP (consumer broadband) - strong signal of residential-capable ISP.
         isp = match_keywords(haystack, ISP_KEYWORDS)
         if isp:
             scores[Classification.ISP] = 0.7

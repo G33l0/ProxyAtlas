@@ -1,8 +1,5 @@
-"""API-based discovery provider.
-
-Adapts JSON APIs that return proxy lists. Supports a configurable auth header
-(credential stored encrypted / supplied via settings, never logged) and a
-JSONPath-lite ``records_key`` to locate the list within the response.
+"""Pulls proxies from a JSON API. Optional auth header (from settings, never
+logged) and a dotted records_key to find the list inside the response.
 """
 
 from __future__ import annotations
@@ -72,7 +69,7 @@ class ApiProvider(DiscoveryProvider):
                     ep = _endpoint_from_dict(rec, default_proto)
                 else:
                     continue
-            except Exception:  # noqa: BLE001 - skip malformed records
+            except Exception:  # noqa: BLE001
                 continue
             yield candidate_from_endpoint(ep, source)
 

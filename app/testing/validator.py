@@ -1,15 +1,9 @@
-"""Asynchronous proxy validator.
+"""Proxy validator.
 
-Performs a *real* proxy-mediated request (never a bare TCP probe) to a
-configurable validation endpoint, measuring connect/response latency, the exit
-IP, authentication outcome, anonymity and DNS behaviour. Transport is chosen
-per protocol:
-
-* HTTP / HTTPS / SOCKS5 — via ``httpx.AsyncClient(proxy=...)``
-* SOCKS4                — via ``aiohttp`` + ``aiohttp_socks.ProxyConnector``
-
-Every failure is caught and mapped to a :class:`ValidationStatus`; a single bad
-proxy can never raise out of :func:`validate_proxy`.
+Makes an actual request through the proxy (not just a TCP connect) and reads
+back latency, exit IP, auth result, anonymity and DNS behaviour. httpx handles
+http/https/socks5, aiohttp-socks handles socks4. validate_proxy swallows every
+error and returns a ValidationStatus instead of raising.
 """
 
 from __future__ import annotations
@@ -167,13 +161,12 @@ async def validate_proxy(
     retry_backoff: float = 0.0,
     protocols: list[Protocol] | None = None,
 ) -> ValidationResult:
-    """Validate a single proxy. Never raises; always returns a result.
+    """Validate one proxy. Always returns a result, never raises.
 
-    ``retries``/``retry_backoff`` re-attempt transient failures (never turning a
-    failure into a false WORKING — success still requires a real proxied request
-    returning a valid exit IP). ``protocols``, when given, tries each protocol in
-    order and returns the first that genuinely works, so a mislabeled candidate
-    (e.g. a plain ``IP:PORT`` list) can still be identified.
+    retries/retry_backoff re-try transient failures; a WORKING result still
+    needs a real request with a valid exit IP, so retrying can't fake one. Pass
+    protocols to try each in turn and take the first that works, which sorts out
+    a mislabeled plain IP:PORT list.
     """
     attempt_protocols = protocols or [endpoint.protocol]
     last: ValidationResult | None = None
@@ -236,13 +229,13 @@ async def _validate_single(
     result = ValidationResult(endpoint=endpoint, status=ValidationStatus.TESTING, tested_at=utcnow())
     timeout = profile.timeout
 
-    # 1. Reachability (informational only — not sufficient for WORKING).
+    # 1. Reachability (informational only - not sufficient for WORKING).
     if profile.check_connectivity:
         try:
             result.connect_time_ms = round(
                 await _tcp_connect_time(endpoint.host, endpoint.port, timeout), 2
             )
-        except Exception as exc:  # noqa: BLE001 - deliberate catch-all
+        except Exception as exc:  # noqa: BLE001
             status, category, detail = _categorize(exc)
             result.status = status
             result.error_category = category
@@ -331,7 +324,7 @@ async def _validate_single(
                 )
                 result.dns_status = status
                 result.dns_evidence = {**evidence, "confidence": conf}
-        except Exception as exc:  # noqa: BLE001 - analysis is best-effort
+        except Exception as exc:  # noqa: BLE001
             logger.debug("Judge request failed for %s: %s", endpoint.identity, exc)
             if result.anonymity == Anonymity.UNKNOWN and profile.header_analysis:
                 result.anonymity = Anonymity.UNKNOWN

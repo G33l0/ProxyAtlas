@@ -1,8 +1,5 @@
-"""Application context — central wiring shared by the UI, CLI and workers.
-
-Holds the resolved paths, settings, database, credential cipher, and the
-discovery/intelligence/job managers. Constructed once during startup by
-:func:`app.services.bootstrap.bootstrap`.
+"""Shared handles (paths, settings, db, cipher, the managers) passed around the
+UI, CLI and workers. Built once in bootstrap().
 """
 
 from __future__ import annotations

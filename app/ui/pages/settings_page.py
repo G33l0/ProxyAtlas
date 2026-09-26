@@ -143,7 +143,7 @@ class SettingsPage(BasePage):
         ipapi = providers.get("ip-api", {})
         f.addRow("Enable ip-api.com", self._combo("providers.ip-api.enabled", ["true", "false"], str(ipapi.get("enabled", True)).lower()))
 
-        # Offline GeoIP (MMDB) — runs first when configured; no network/rate limits.
+        # Offline GeoIP (MMDB) - runs first when configured; no network/rate limits.
         mmdb = providers.get("mmdb", {})
         f.addRow("Offline GeoIP city/country .mmdb", self._line("providers.mmdb.city_db", mmdb.get("city_db", "")))
         f.addRow("Offline GeoIP ASN .mmdb", self._line("providers.mmdb.asn_db", mmdb.get("asn_db", "")))
@@ -175,9 +175,9 @@ class SettingsPage(BasePage):
         rl = QHBoxLayout(row)
         rl.setContentsMargins(0, 0, 0, 0)
         rl.addWidget(path_edit)
-        browse_dir = QPushButton("Folder…")
+        browse_dir = QPushButton("Folder...")
         browse_dir.clicked.connect(lambda: self._browse_db_folder(path_edit))
-        browse_file = QPushButton("File…")
+        browse_file = QPushButton("File...")
         browse_file.clicked.connect(lambda: self._browse_db_file(path_edit))
         rl.addWidget(browse_dir)
         rl.addWidget(browse_file)

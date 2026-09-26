@@ -41,7 +41,7 @@ def ctx(data_dir):
 
 
 class _Origin(http.server.BaseHTTPRequestHandler):
-    def log_message(self, *args):  # noqa: D401 - silence
+    def log_message(self, *args):  # noqa: D401
         pass
 
     def do_GET(self):  # noqa: N802

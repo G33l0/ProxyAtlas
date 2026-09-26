@@ -51,9 +51,9 @@ class AboutPage(BasePage):
         layout.addWidget(desc, alignment=Qt.AlignmentFlag.AlignCenter)
 
         features = QLabel(
-            "Protocols: HTTP · HTTPS · SOCKS4 · SOCKS5\n"
-            "Classifications: Residential · Mobile · Datacenter · ISP · Business · "
-            "Educational · Government · Unknown\n"
+            "Protocols: HTTP / HTTPS / SOCKS4 / SOCKS5\n"
+            "Classifications: Residential / Mobile / Datacenter / ISP / Business / "
+            "Educational / Government / Unknown\n"
             "Storage: SQLite + SQLAlchemy + Alembic"
         )
         features.setObjectName("PageSubtitle")
@@ -64,7 +64,7 @@ class AboutPage(BasePage):
         self.root.addWidget(card)
         self.root.addStretch(1)
 
-        footer = QLabel("© 2026 ProxyAtlas Project · MIT License")
+        footer = QLabel("© 2026 ProxyAtlas Project / MIT License")
         footer.setObjectName("StatLabel")
         footer.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.root.addWidget(footer)

@@ -1,8 +1,5 @@
-"""Credential protection using Fernet symmetric encryption.
-
-Proxy credentials and provider API keys are encrypted at rest with a key
-derived per-install (or supplied via ``PROXYATLAS_SECRET_KEY``). The key file
-is written with restrictive permissions. Credentials are never logged.
+"""Fernet encryption for proxy credentials and API keys. The key is per-install
+(or PROXYATLAS_SECRET_KEY) and the key file is chmod 0600. Nothing here is logged.
 """
 
 from __future__ import annotations

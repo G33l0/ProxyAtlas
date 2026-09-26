@@ -1,6 +1,6 @@
 """UI tests: startup, navigation, theme switching, import, filtering, settings.
 
-These use pytest-qt's ``qtbot`` and run under the offscreen Qt platform.
+These use pytest-qt's `qtbot` and run under the offscreen Qt platform.
 """
 
 from __future__ import annotations

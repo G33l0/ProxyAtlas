@@ -16,7 +16,7 @@ pip install -r requirements.txt
 - Keep modules reasonably sized and use type hints and docstrings on public
   interfaces.
 - Do not hard-code credentials or demonstration proxy records.
-- Do not perform blocking network I/O on the Qt GUI thread — use the async
+- Do not perform blocking network I/O on the Qt GUI thread - use the async
   engines and Qt workers.
 
 ## Adding a provider

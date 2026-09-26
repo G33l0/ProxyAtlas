@@ -1,8 +1,5 @@
-"""Programmatic, theme-aware navigation/action icons.
-
-Icons are drawn with QPainter paths in a requested color, so they stay crisp at
-any DPI and recolor instantly on theme change — no external icon files needed.
-The application logo/pixmaps are loaded from bundled assets.
+"""Nav/action icons drawn with QPainter in the theme color, so they're sharp at
+any DPI and recolor on a theme switch. The logo pixmaps come from the assets dir.
 """
 
 from __future__ import annotations

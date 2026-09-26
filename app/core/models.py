@@ -1,8 +1,5 @@
-"""Lightweight dataclasses that flow through the processing pipeline.
-
-These are transport objects (not ORM rows). They keep the discovery →
-validation → intelligence → classification chain decoupled from SQLAlchemy so
-each engine can be tested in isolation.
+"""Plain dataclasses passed between the stages. Not ORM rows, so the engines
+stay independent of SQLAlchemy and are easy to test on their own.
 """
 
 from __future__ import annotations

@@ -1,9 +1,6 @@
-"""Deduplication of endpoints and candidates by endpoint identity.
-
-Identity is ``protocol://host:port`` (credentials excluded), so the same host
-seen via multiple sources or with/without credentials collapses to one entry.
-When merging candidates, credentials and source metadata from the richest
-record are preferred.
+"""Dedupe by protocol://host:port (credentials don't count), so the same host
+from several sources collapses to one. When merging, keep whichever record
+carries credentials and remember every source it came from.
 """
 
 from __future__ import annotations
@@ -33,8 +30,8 @@ def dedupe_endpoints(endpoints: Iterable[Endpoint]) -> list[Endpoint]:
 def dedupe_candidates(candidates: Iterable[ProxyCandidate]) -> list[ProxyCandidate]:
     """Deduplicate candidates by endpoint identity.
 
-    Keeps the earliest ``discovered_at``; merges credentials and records all
-    contributing sources in ``metadata['sources']``.
+    Keeps the earliest `discovered_at`; merges credentials and records all
+    contributing sources in `metadata['sources']`.
     """
     seen: dict[str, ProxyCandidate] = {}
     for cand in candidates:

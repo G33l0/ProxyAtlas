@@ -1,10 +1,6 @@
-"""Application configuration.
-
-Settings are persisted to a JSON file in the data directory. Provider
-credentials are *not* stored here in plaintext — they are handled by
-:mod:`app.services.credentials`. Defaults are defined once in
-:data:`DEFAULT_SETTINGS` so the Settings UI and the engines share one source
-of truth.
+"""Settings, persisted as JSON in the data dir. Defaults live in
+DEFAULT_SETTINGS. Provider credentials are handled by app.services.credentials,
+not stored here in plaintext.
 """
 
 from __future__ import annotations
@@ -71,7 +67,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
 
 
 def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
-    """Recursively merge ``override`` into a copy of ``base``."""
+    """Recursively merge `override` into a copy of `base`."""
     result = dict(base)
     for key, value in override.items():
         if key in result and isinstance(result[key], dict) and isinstance(value, dict):

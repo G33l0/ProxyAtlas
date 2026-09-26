@@ -1,6 +1,6 @@
 """Discovery-stage deduplication.
 
-Wraps :mod:`app.proxy.deduplicator` for candidate batches and adds a helper to
+Wraps `app.proxy.deduplicator` for candidate batches and adds a helper to
 drop candidates whose identity already exists in the discovery queue / main DB.
 """
 

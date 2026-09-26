@@ -1,8 +1,5 @@
-"""Programmatic Alembic runner.
-
-Runs migrations to ``head`` against the resolved database URL during startup,
-falling back to ``create_all`` if Alembic is unavailable. This keeps the schema
-current whether launched from source or a frozen executable.
+"""Runs Alembic up to head at startup, falling back to create_all if Alembic
+isn't importable (e.g. a stripped frozen build).
 """
 
 from __future__ import annotations

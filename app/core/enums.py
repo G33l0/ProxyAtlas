@@ -1,7 +1,5 @@
-"""Enumerations shared across ProxyAtlas.
-
-These are plain ``str`` enums so they serialize cleanly into SQLite, JSON,
-exports and Qt item-data without extra conversion.
+"""Shared enums. Plain str enums so they drop straight into SQLite, JSON,
+exports and Qt item-data.
 """
 
 from __future__ import annotations
@@ -10,14 +8,14 @@ from enum import Enum
 
 
 class StrEnum(str, Enum):
-    """String enum whose ``str()`` is the value (Py3.10 compatible)."""
+    """String enum whose `str()` is the value (Py3.10 compatible)."""
 
     def __str__(self) -> str:  # pragma: no cover - trivial
         return str(self.value)
 
     @classmethod
     def from_value(cls, value: object, default: StrEnum | None = None) -> StrEnum | None:
-        """Return a member for ``value`` (case-insensitive) or ``default``."""
+        """Return a member for `value` (case-insensitive) or `default`."""
         if value is None:
             return default
         if isinstance(value, cls):
