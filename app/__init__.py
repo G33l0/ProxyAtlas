@@ -1,8 +1,4 @@
-"""ProxyAtlas — Discover. Validate. Analyze. Manage.
-
-A PyQt6 desktop application for discovering, validating, classifying,
-monitoring and managing proxy endpoints.
-"""
+"""ProxyAtlas: proxy discovery, validation, intelligence and monitoring."""
 
 __version__ = "1.0.0"
 __app_name__ = "ProxyAtlas"

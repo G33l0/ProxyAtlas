@@ -1,9 +1,6 @@
-"""Anonymity analysis based on observable HTTP behaviour.
-
-Given the headers a judge endpoint (e.g. httpbin ``/get``) echoes back, plus
-the caller's own public IP baseline, classify the proxy's anonymity. Evidence
-is recorded so the UI can explain the verdict; certainty is not claimed where
-the test cannot establish it.
+"""Guess a proxy's anonymity from the headers a judge endpoint (httpbin /get)
+echoes back plus our own public IP. We record the evidence and don't claim
+certainty the headers can't support.
 """
 
 from __future__ import annotations
@@ -31,12 +28,12 @@ def analyze_anonymity(
     exit_ip: str | None,
     real_ip: str | None,
 ) -> tuple[Anonymity, dict[str, Any]]:
-    """Return an :class:`Anonymity` level and supporting evidence.
+    """Return an `Anonymity` level and supporting evidence.
 
-    * ``TRANSPARENT``  — the client's real IP is exposed.
-    * ``ANONYMOUS``    — proxy headers present but real IP hidden.
-    * ``ELITE``        — no proxy headers and real IP hidden.
-    * ``UNKNOWN``      — insufficient signal.
+    * `TRANSPARENT`  - the client's real IP is exposed.
+    * `ANONYMOUS`    - proxy headers present but real IP hidden.
+    * `ELITE`        - no proxy headers and real IP hidden.
+    * `UNKNOWN`      - insufficient signal.
     """
     normalized = {k.lower(): v for k, v in echoed_headers.items()}
     evidence: dict[str, Any] = {"proxy_headers": [], "real_ip_leaked": False}

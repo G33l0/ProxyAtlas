@@ -1,8 +1,8 @@
 # Running ProxyAtlas on Termux (Android)
 
-ProxyAtlas runs **headlessly** on Termux. The processing engine — discovery,
+ProxyAtlas runs **headlessly** on Termux. The processing engine - discovery,
 validation over HTTP/HTTPS/SOCKS4/SOCKS5, exit-IP detection, intelligence,
-classification, quality scoring, monitoring, exports and reports — is pure
+classification, quality scoring, monitoring, exports and reports - is pure
 Python and works from the command line. The PyQt6 desktop GUI is not available
 on Termux (Qt6 has no Termux wheels), so you drive ProxyAtlas with the CLI,
 which exposes the full workflow.
@@ -44,7 +44,7 @@ desktop.
 
 By default the database lives under Termux's private home
 (`~/.local/share/ProxyAtlas`). To keep it on shared storage or an SD card
-(useful for large datasets — the same "external drive" feature the desktop
+(useful for large datasets - the same "external drive" feature the desktop
 Settings expose):
 
 ```bash
@@ -84,11 +84,11 @@ validation, e.g. revalidate and re-export every few hours:
 
 ## Troubleshooting
 
-- **`No module named PyQt6` when running with no arguments** — expected on
+- **`No module named PyQt6` when running with no arguments** - expected on
   Termux; ProxyAtlas prints CLI usage. Always pass a CLI flag.
-- **`cryptography` build errors** — install `rust`, `clang`, `openssl`, or use
+- **`cryptography` build errors** - install `rust`, `clang`, `openssl`, or use
   `pkg install python-cryptography`.
-- **`aiohttp` build errors** — ensure `clang` is installed; `pip install
+- **`aiohttp` build errors** - ensure `clang` is installed; `pip install
   --upgrade pip` then retry.
-- **Permission denied writing the database** — run `termux-setup-storage` and
+- **Permission denied writing the database** - run `termux-setup-storage` and
   use a path under `~/storage/`.

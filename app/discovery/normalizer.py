@@ -43,7 +43,7 @@ def normalize_lines(
             continue
         try:
             ep = parse_proxy(raw, default_protocol)
-        except Exception as exc:  # noqa: BLE001 - parser raises ParseError
+        except Exception as exc:  # noqa: BLE001
             errors.append((raw, str(exc)))
             continue
         cand = candidate_from_endpoint(ep, source, source_reference)
@@ -70,7 +70,7 @@ def normalize_csv(
             raw = _row_to_proxy_string(cells)
             ep = parse_proxy(raw, default_protocol)
             candidates.append(candidate_from_endpoint(ep, source))
-        except Exception as exc:  # noqa: BLE001 - skip header/malformed rows
+        except Exception as exc:  # noqa: BLE001
             errors.append((",".join(cells), str(exc)))
     return candidates, errors
 

@@ -21,12 +21,12 @@ Semantic Versioning.
 - **Termux / headless support**: `requirements-cli.txt`, a graceful
   GUI-unavailable message, and `docs/termux.md` install/usage guide.
 - External-drive / custom database storage: point the database at any folder or
-  drive (Settings → Database), with a one-click relocate, writability validation
+  drive (Settings -> Database), with a one-click relocate, writability validation
   and graceful fallback to the default location when the drive is unavailable.
 
 ### Verified
-- Real end-to-end run against a live public proxy feed (2,847 candidates →
-  validated → genuine working proxies with exit IP, geolocation, ISP,
+- Real end-to-end run against a live public proxy feed (2,847 candidates ->
+  validated -> genuine working proxies with exit IP, geolocation, ISP,
   classification, score and export).
 - Internet Discovery generates candidates that enter the same validation
   pipeline with stored provenance.

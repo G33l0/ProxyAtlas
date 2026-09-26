@@ -1,9 +1,6 @@
-"""Application bootstrap / startup sequence.
-
-Implements the first-launch and later-launch steps: create directories,
-configure logging, run migrations, load settings, initialize the credential
-cipher, build managers and register providers, and seed default discovery
-sources on first run. Returns a fully wired :class:`AppContext`.
+"""Startup: make dirs, set up logging, migrate, load settings, build the
+cipher and managers, seed default sources on first run, and hand back a wired
+AppContext.
 """
 
 from __future__ import annotations

@@ -1,13 +1,6 @@
-"""Validation → intelligence → classification → quality → database pipeline.
+"""Runs candidates through validate -> intelligence -> classify -> score -> store.
 
-This is the orchestration heart of ProxyAtlas. Given a batch of candidates it:
-
-1. Runs the concurrent validation engine (real proxied requests).
-2. Enriches successful proxies with IP intelligence (bounded concurrency).
-3. Classifies them from evidence and computes an explainable quality score.
-4. Persists everything to the database in batched transactions.
-
-It is fully async and driven by the Qt workers; it never touches Qt itself.
+Async only, no Qt imports; the workers drive it.
 """
 
 from __future__ import annotations
@@ -64,8 +57,7 @@ class ProcessingPipeline:
     ) -> PipelineResult:
         candidates = list(candidates)
         by_identity = {c.identity: c for c in candidates}
-        # Fallback lookup ignoring protocol, so a candidate whose protocol was
-        # corrected by auto-detection still maps back to its original source.
+        # keyed without protocol, for when auto-detect changed it
         by_hostport = {(c.endpoint.host, c.endpoint.port): c for c in candidates}
         endpoints = [c.endpoint for c in candidates]
 
@@ -100,7 +92,7 @@ class ProcessingPipeline:
                 async with sem:
                     try:
                         intel_map[res.endpoint.identity] = await self.intelligence.lookup(res.exit_ip)
-                    except Exception as exc:  # noqa: BLE001 - non-fatal
+                    except Exception as exc:  # noqa: BLE001
                         logger.warning("Intelligence enrichment failed: %s", exc)
 
             await asyncio.gather(*(enrich(r) for r in results), return_exceptions=True)
@@ -113,11 +105,8 @@ class ProcessingPipeline:
             for res in results:
                 cand = by_identity.get(res.endpoint.identity)
                 if cand is None:
+                    # protocol got corrected: keep the source, drop the old row
                     original = by_hostport.get((res.endpoint.host, res.endpoint.port))
-                    # Auto-detection corrected the protocol: adopt the detected
-                    # one, preserve the original source, and remove any stale
-                    # row that still carries the mislabeled protocol so the same
-                    # host:port never appears twice.
                     cand = ProxyCandidate(
                         endpoint=res.endpoint,
                         source=original.source if original else "validation",

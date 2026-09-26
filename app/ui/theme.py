@@ -1,9 +1,6 @@
-"""Centralized theme system: Light, Dark and Midnight.
-
-Each theme is a palette of named colors used both to build a comprehensive QSS
-stylesheet (covering windows, sidebar, cards, buttons, inputs, tables, dialogs,
-menus, scrollbars) and to color the custom-painted charts and status
-indicators. Themes switch live and the choice is persisted in settings.
+"""Light, Dark and Midnight themes. A palette drives both the QSS stylesheet and
+the hand-painted charts, so a theme switch restyles everything at once. The pick
+is saved in settings.
 """
 
 from __future__ import annotations

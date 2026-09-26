@@ -148,7 +148,7 @@ class TestingPage(BasePage):
         self.stop_btn.setEnabled(True)
         self.progress.setValue(0)
         self._worker.start()
-        self.toast(f"Testing {len(candidates)} prox{'y' if len(candidates)==1 else 'ies'}…", "info")
+        self.toast(f"Testing {len(candidates)} prox{'y' if len(candidates)==1 else 'ies'}...", "info")
 
     def _on_progress(self, snap: dict) -> None:
         for key, card in self._stats.items():
@@ -186,4 +186,4 @@ class TestingPage(BasePage):
     def _stop(self) -> None:
         if self._control:
             self._control.stop()
-            self.toast("Stopping…", "info")
+            self.toast("Stopping...", "info")

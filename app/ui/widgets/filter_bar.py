@@ -1,4 +1,4 @@
-"""Advanced filter bar producing a :class:`FilterSpec`."""
+"""Advanced filter bar producing a `FilterSpec`."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ class FilterBar(QWidget):
         grid.setVerticalSpacing(6)
 
         self.search = QLineEdit()
-        self.search.setPlaceholderText("Search host, exit IP, ISP, country, ASN…")
+        self.search.setPlaceholderText("Search host, exit IP, ISP, country, ASN...")
         self.search.returnPressed.connect(self._emit_apply)
 
         self.protocol = self._combo(["Any protocol"] + [p.value.upper() for p in Protocol])

@@ -1,4 +1,4 @@
-"""Internet Discovery page — generate candidates over authorized address space."""
+"""Internet Discovery page - generate candidates over authorized address space."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ class InternetDiscoveryPage(BasePage):
     def __init__(self, ctx, main_window) -> None:
         super().__init__(
             ctx, main_window, "Internet Discovery",
-            "Generate proxy candidates across authorized CIDR ranges — all enter the standard pipeline",
+            "Generate proxy candidates across authorized CIDR ranges - all enter the standard pipeline",
         )
         self._workers: list = []
         self._control: JobControl | None = None
@@ -99,12 +99,12 @@ class InternetDiscoveryPage(BasePage):
         self._generated = 0
         worker = DiscoveryWorker(self.ctx, "internet", cfg, self._control)
         worker.item.connect(self._on_candidate)
-        worker.progress.connect(lambda snap: self.status_card.set_value("Generating…"))
+        worker.progress.connect(lambda snap: self.status_card.set_value("Generating..."))
         worker.completed.connect(lambda out: self._done(out, worker))
         worker.failed.connect(lambda e: self.toast(f"Generation failed: {e}", "error"))
         self._workers.append(worker)
         self.stop_btn.setEnabled(True)
-        self.status_card.set_value("Generating…")
+        self.status_card.set_value("Generating...")
         worker.start()
 
     def _on_candidate(self, cand) -> None:
@@ -139,7 +139,7 @@ class InternetDiscoveryPage(BasePage):
         worker.completed.connect(lambda res: self._validated(res, worker))
         worker.failed.connect(lambda e: self.toast(f"Validation failed: {e}", "error"))
         self._workers.append(worker)
-        self.status_card.set_value("Validating…")
+        self.status_card.set_value("Validating...")
         worker.start()
 
     def _validated(self, res, worker) -> None:
@@ -154,4 +154,4 @@ class InternetDiscoveryPage(BasePage):
     def _stop(self) -> None:
         if self._control:
             self._control.stop()
-            self.status_card.set_value("Stopping…")
+            self.status_card.set_value("Stopping...")

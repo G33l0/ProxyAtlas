@@ -1,8 +1,5 @@
-"""Feed-based discovery provider.
-
-Fetches proxy data from a configured URL that returns a proxy list (plain text,
-CSV or JSON). Responses are treated as untrusted: they are size-capped and
-parsed defensively; malformed records are skipped, never executed.
+"""Pulls a proxy list from a URL (text, CSV or JSON). The response is untrusted
+so it's size-capped and parsed loosely; junk lines are skipped, never run.
 """
 
 from __future__ import annotations

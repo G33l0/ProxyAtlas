@@ -1,8 +1,5 @@
-"""A tiny thread-safe pub/sub event bus.
-
-Used by non-Qt engine code to publish progress/state without importing Qt.
-The UI layer subscribes and re-emits on Qt signals. Keeping this Qt-free lets
-the engines be unit tested headlessly.
+"""Small thread-safe pub/sub bus. Engine code publishes progress here without
+pulling in Qt; the UI subscribes and re-emits on Qt signals.
 """
 
 from __future__ import annotations
@@ -21,7 +18,7 @@ class EventBus:
         self._lock = threading.RLock()
 
     def subscribe(self, topic: str, callback: Callable[[Any], None]) -> Callable[[], None]:
-        """Register ``callback`` for ``topic``. Returns an unsubscribe func."""
+        """Register `callback` for `topic`. Returns an unsubscribe func."""
         with self._lock:
             self._subscribers[topic].append(callback)
 

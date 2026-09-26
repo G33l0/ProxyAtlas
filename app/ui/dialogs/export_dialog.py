@@ -50,7 +50,7 @@ class ExportDialog(QDialog):
             from PyQt6.QtWidgets import QLabel
 
             warn = QLabel(
-                "⚠ Writes proxy usernames/passwords in clear text to the export "
+                "Warning: writes proxy usernames/passwords in clear text to the export "
                 "file. Only enable if you understand the risk and store the file "
                 "securely."
             )
@@ -65,7 +65,7 @@ class ExportDialog(QDialog):
         default_name = "proxyatlas_report.html" if as_report else "proxyatlas_export.txt"
         base = default_dir.rstrip("/") + "/" if default_dir else ""
         self.path_edit.setText(base + default_name)
-        browse = QPushButton("Browse…")
+        browse = QPushButton("Browse...")
         browse.clicked.connect(self._browse)
         path_row.addWidget(self.path_edit)
         path_row.addWidget(browse)

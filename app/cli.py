@@ -77,7 +77,7 @@ def _cmd_validate(ctx: AppContext, profile: str, limit: int | None) -> int:
             intelligence_enabled=ctx.intelligence_enabled(),
         )
         prof = get_profile(profile, ctx.custom_profiles())
-        print(f"Validating {len(candidates)} candidate(s) with profile '{profile}'…")
+        print(f"Validating {len(candidates)} candidate(s) with profile '{profile}'...")
         result = await pipeline.process(candidates, prof)
         with ctx.database.session() as session:
             repo.delete_discovery_results(session, ids)
@@ -128,7 +128,7 @@ def _cmd_stats(ctx: AppContext) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="proxyatlas", description="ProxyAtlas — Discover. Validate. Analyze. Manage.")
+    parser = argparse.ArgumentParser(prog="proxyatlas", description="ProxyAtlas - Discover. Validate. Analyze. Manage.")
     parser.add_argument("--version", action="store_true", help="Print version and exit")
     parser.add_argument("--import", dest="import_path", metavar="FILE", help="Import a proxy list into the queue")
     parser.add_argument("--discover", action="store_true", help="Run all enabled discovery sources")
@@ -140,7 +140,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--limit", type=int, help="Limit number of candidates to validate")
     parser.add_argument("--working-only", action="store_true", help="Export only working proxies")
     parser.add_argument("--include-credentials", action="store_true",
-                        help="Include proxy credentials in the export (PLAINTEXT — use with care)")
+                        help="Include proxy credentials in the export (PLAINTEXT - use with care)")
     parser.add_argument("--gui", action="store_true", help="Launch the graphical interface")
     return parser
 
@@ -163,7 +163,7 @@ def main(argv: list[str] | None = None) -> int:
             print(
                 "The graphical interface requires PyQt6, which is not installed "
                 "in this environment (e.g. Termux/headless).\n"
-                "ProxyAtlas still works headlessly — use the CLI, for example:\n"
+                "ProxyAtlas still works headlessly - use the CLI, for example:\n"
                 "  proxyatlas --import proxies.txt\n"
                 "  proxyatlas --validate --profile quick\n"
                 "  proxyatlas --export working.txt --working-only\n"

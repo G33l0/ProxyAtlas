@@ -33,10 +33,10 @@ class ReportsPage(BasePage):
         for label, spec in QUICK_FILTERS:
             self.filter_combo.addItem(label, spec)
         cl.addWidget(self.filter_combo)
-        report_btn = QPushButton("Generate Report…")
+        report_btn = QPushButton("Generate Report...")
         report_btn.setObjectName("Primary")
         report_btn.clicked.connect(lambda: self._generate(as_report=True))
-        export_btn = QPushButton("Export Data…")
+        export_btn = QPushButton("Export Data...")
         export_btn.clicked.connect(lambda: self._generate(as_report=False))
         cl.addWidget(report_btn)
         cl.addWidget(export_btn)
@@ -87,11 +87,11 @@ class ReportsPage(BasePage):
         worker.completed.connect(lambda info: self._done(info, worker))
         worker.failed.connect(lambda e: self.toast(f"Generation failed: {e}", "error"))
         self._workers.append(worker)
-        self.toast("Generating…", "info")
+        self.toast("Generating...", "info")
         worker.start()
 
     def _done(self, info: dict, worker) -> None:
-        self.toast(f"Wrote {info['count']} records → {info['path']}", "success")
+        self.toast(f"Wrote {info['count']} records -> {info['path']}", "success")
         if worker in self._workers:
             self._workers.remove(worker)
         self.refresh()

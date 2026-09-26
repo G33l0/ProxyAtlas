@@ -1,4 +1,4 @@
-"""Base async worker running an asyncio loop inside a QThread."""
+"""QThread that spins up an asyncio loop and runs a coroutine on it."""
 
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ class AsyncWorker(QThread):
     """Runs a coroutine factory in a dedicated event loop.
 
     Signals:
-        progress(dict)   — periodic progress snapshots
-        item(object)     — a streamed result/candidate
-        failed(str)      — an unrecoverable error message
-        completed(object)— the coroutine's return value on success
+        progress(dict)   - periodic progress snapshots
+        item(object)     - a streamed result/candidate
+        failed(str)      - an unrecoverable error message
+        completed(object)- the coroutine's return value on success
     """
 
     progress = pyqtSignal(dict)
@@ -31,14 +31,14 @@ class AsyncWorker(QThread):
         self._coro_factory = coro_factory
         self._loop: asyncio.AbstractEventLoop | None = None
 
-    def run(self) -> None:  # noqa: D401 - QThread entry point
+    def run(self) -> None:  # noqa: D401
         loop = asyncio.new_event_loop()
         self._loop = loop
         asyncio.set_event_loop(loop)
         try:
             result = loop.run_until_complete(self._coro_factory(self))
             self.completed.emit(result)
-        except Exception as exc:  # noqa: BLE001 - surface to GUI
+        except Exception as exc:  # noqa: BLE001
             logger.exception("Worker failed")
             self.failed.emit(str(exc))
         finally:

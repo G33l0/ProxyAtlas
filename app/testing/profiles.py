@@ -1,8 +1,5 @@
-"""Validation profiles controlling how deep a proxy is tested.
-
-A :class:`ValidationProfile` is a set of feature flags plus tuning. Three
-built-ins (Quick, Standard, Deep) are provided, and users may create custom
-profiles which are persisted in settings.
+"""Validation profiles: feature flags plus tuning that decide how far a check
+goes. Quick/Standard/Deep ship built in; custom ones are saved in settings.
 """
 
 from __future__ import annotations

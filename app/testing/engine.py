@@ -1,9 +1,7 @@
-"""Concurrent validation engine with pause/resume/stop.
+"""Runs validate_proxy over a batch with a semaphore cap and pause/resume/stop.
 
-Runs :func:`validate_proxy` across many candidates using a bounded
-``asyncio.Semaphore`` (no thread-per-proxy). Control flags are
-:class:`threading.Event` objects so the GUI thread can pause/resume/stop
-safely without touching the event loop. Progress is reported via callbacks.
+Control flags are threading.Events so the GUI thread can flip them without
+reaching into the event loop. Progress goes out through callbacks.
 """
 
 from __future__ import annotations
@@ -162,7 +160,7 @@ class ValidationEngine:
                         retry_backoff=self.retry_backoff,
                         protocols=self._protocols_for(ep),
                     )
-                except Exception as exc:  # noqa: BLE001 - safety net
+                except Exception as exc:  # noqa: BLE001
                     logger.exception("Validator crashed for %s", ep.identity)
                     res = ValidationResult(
                         endpoint=ep,
@@ -194,7 +192,7 @@ class ValidationEngine:
         tried first and returned immediately if it genuinely works, so a
         correctly-labeled proxy is never reclassified; only when its own
         protocol fails are the others attempted (correcting a mislabeled or
-        scheme-less candidate). Returns ``None`` (single protocol) when disabled.
+        scheme-less candidate). Returns `None` (single protocol) when disabled.
         """
         if not self.autodetect_protocols:
             return None

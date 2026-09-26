@@ -1,4 +1,4 @@
-"""Monitoring worker — runs one monitoring pass in the background."""
+"""Monitoring worker - runs one monitoring pass in the background."""
 
 from __future__ import annotations
 

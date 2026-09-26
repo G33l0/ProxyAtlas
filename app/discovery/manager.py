@@ -1,10 +1,6 @@
-"""Discovery manager and provider registry.
-
-Maps provider identifiers to provider classes, builds providers from stored
-:class:`ProxySource` configuration, and runs discovery fault-tolerantly: a
-single bad record or provider error never aborts the batch. All results funnel
-through normalization + dedup and are emitted as candidates for the shared
-validation pipeline.
+"""Provider registry plus the runner. Builds a provider from a stored
+ProxySource and runs it so one bad record or a provider blowing up doesn't kill
+the batch. Output is normalized, deduped and handed on as candidates.
 """
 
 from __future__ import annotations
@@ -89,9 +85,9 @@ class DiscoveryManager:
                 if on_candidate:
                     try:
                         on_candidate(candidate)
-                    except Exception:  # noqa: BLE001 - callback isolation
+                    except Exception:  # noqa: BLE001
                         logger.exception("on_candidate callback failed")
-        except Exception as exc:  # noqa: BLE001 - provider-level failure
+        except Exception as exc:  # noqa: BLE001
             logger.exception("Provider %s failed", provider.name())
             errors.append(f"{provider.name()}: {exc}")
 

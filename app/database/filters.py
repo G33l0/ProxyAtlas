@@ -1,8 +1,6 @@
-"""Declarative filter specification for querying proxies.
-
-A :class:`FilterSpec` is a serializable set of conditions the repository
-translates into SQLAlchemy expressions. This keeps the UI, saved collections
-and exports using one filter language, and allows AND/OR combination.
+"""FilterSpec: a serializable set of conditions the repository turns into
+SQLAlchemy expressions. One filter language for the UI, collections and exports,
+combined with AND or OR.
 """
 
 from __future__ import annotations

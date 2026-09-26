@@ -1,9 +1,5 @@
-"""Conservative DNS behaviour analysis for a validated proxy.
-
-True DNS-leak detection requires dedicated infrastructure; this module makes
-only claims the available signals support and reports a confidence. It checks
-whether the exit IP and any echoed forwarding headers are consistent, and
-whether the proxy appears to resolve names itself.
+"""Rough DNS check. Real leak detection needs its own infra, so this only
+reports what the exit IP and forwarding headers actually show, with a confidence.
 """
 
 from __future__ import annotations
@@ -20,9 +16,9 @@ def analyze_dns(
     echoed_headers: dict[str, str],
     real_ip: str | None,
 ) -> tuple[DnsStatus, dict[str, Any], float]:
-    """Return ``(status, evidence, confidence)``.
+    """Return `(status, evidence, confidence)`.
 
-    Confidence is 0..1 and deliberately modest — the test cannot prove the
+    Confidence is 0..1 and deliberately modest - the test cannot prove the
     absence of a leak.
     """
     evidence: dict[str, Any] = {}

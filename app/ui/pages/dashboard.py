@@ -71,7 +71,7 @@ class DashboardPage(BasePage):
             h = QLabel(heading)
             h.setObjectName("StatLabel")
             col.addWidget(h)
-            body = QLabel("—")
+            body = QLabel("-")
             body.setWordWrap(True)
             body.setStyleSheet("font-size:12px;")
             body.setAlignment(body.alignment())
@@ -102,8 +102,8 @@ class DashboardPage(BasePage):
             activity = repo.recent_activity(session, limit=6)
             act_text = {
                 "discovered": [f"{p.host}:{p.port} ({p.protocol})" for p in activity["discovered"]],
-                "working": [f"{p.host}:{p.port} · {p.country_code or '—'} · {p.latency or '—'}ms" for p in activity["working"]],
-                "failed": [f"{p.host}:{p.port} · {p.status}" for p in activity["failed"]],
+                "working": [f"{p.host}:{p.port} / {p.country_code or '-'} / {p.latency or '-'}ms" for p in activity["working"]],
+                "failed": [f"{p.host}:{p.port} / {p.status}" for p in activity["failed"]],
             }
 
         self._cards["total"].set_value(stats["total"])
@@ -121,4 +121,4 @@ class DashboardPage(BasePage):
         self.latency_chart.set_data(buckets)
 
         for key, lines in act_text.items():
-            self._activity_labels[key].setText("\n".join(lines) if lines else "—")
+            self._activity_labels[key].setText("\n".join(lines) if lines else "-")

@@ -1,8 +1,5 @@
-"""Global job manager.
-
-Tracks every long-running job (discovery, validation, intelligence, monitoring,
-export, report) with state, progress and counters. Thread-safe so both the GUI
-thread and worker threads can read/update. The UI subscribes via the event bus.
+"""Tracks long-running jobs (state, progress, counters). Thread-safe; the UI
+follows along through the event bus.
 """
 
 from __future__ import annotations

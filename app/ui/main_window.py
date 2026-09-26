@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ctx = ctx
         self.theme_manager = ThemeManager(ctx.settings)
-        self.setWindowTitle(f"ProxyAtlas — {__tagline__}")
+        self.setWindowTitle(f"ProxyAtlas - {__tagline__}")
         self.setWindowIcon(app_icon())
         self.resize(1360, 860)
         self.setMinimumSize(1040, 680)
@@ -133,7 +133,7 @@ class MainWindow(QMainWindow):
             logo.setText("ProxyAtlas")
             logo.setObjectName("SidebarTitle")
         layout.addWidget(logo)
-        tag = QLabel("DISCOVER · VALIDATE · ANALYZE")
+        tag = QLabel("DISCOVER / VALIDATE / ANALYZE")
         tag.setObjectName("SidebarTag")
         layout.addWidget(tag)
         layout.addSpacing(14)
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
         state = snapshot.get("state")
         label = snapshot.get("label", "Job")
         if state == "running":
-            self._job_status.setText(f"⏵ {label}: {snapshot.get('progress', 0):.0f}%")
+            self._job_status.setText(f"> {label}: {snapshot.get('progress', 0):.0f}%")
         elif state in ("completed", "failed", "cancelled"):
             self._job_status.setText(f"{label}: {state}")
 
@@ -230,7 +230,7 @@ class MainWindow(QMainWindow):
                         next_run = next_run.replace(tzinfo=timezone.utc)
                     if next_run is None or next_run <= now:
                         due.append((j.id, j.target_type, j.target_ref or ""))
-        except Exception:  # noqa: BLE001 - scheduler must never crash the UI
+        except Exception:  # noqa: BLE001
             return
 
         for job_id, target_type, target_ref in due:

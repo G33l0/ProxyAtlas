@@ -1,9 +1,6 @@
-"""Offline built-in intelligence provider.
-
-Requires no external service or API key. It performs a reverse-DNS lookup and
-derives hosting indicators from the PTR record, plus private-range detection.
-This guarantees the pipeline always has *some* intelligence even with no
-network providers configured.
+"""Offline provider, no API key. Reverse-DNS lookup, hosting hints from the PTR
+record and private-range detection, so there's always something even with no
+network providers.
 """
 
 from __future__ import annotations

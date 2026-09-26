@@ -1,9 +1,6 @@
-"""Filesystem path resolution for ProxyAtlas.
-
-All runtime data (database, logs, exports, reports, keys, config) lives under
-a single platform-appropriate data directory, overridable with the
-``PROXYATLAS_DATA_DIR`` environment variable. Kept dependency-free so it can
-be imported very early during startup.
+"""Where runtime data lives. Everything (db, logs, exports, reports, keys,
+config) sits under one per-user data dir, overridable with PROXYATLAS_DATA_DIR.
+No third-party imports so it can load early in startup.
 """
 
 from __future__ import annotations
@@ -55,7 +52,7 @@ class AppPaths:
 
 
 def package_root() -> Path:
-    """Path to the ``app`` package directory (works frozen and unfrozen)."""
+    """Path to the `app` package directory (works frozen and unfrozen)."""
     if getattr(sys, "frozen", False):  # PyInstaller bundle
         return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent))
     return Path(__file__).resolve().parent.parent
@@ -65,7 +62,7 @@ def assets_dir() -> Path:
     """Path to bundled assets (logo, icons, images)."""
     root = package_root()
     # In a PyInstaller bundle assets sit beside the package; in dev they are
-    # one level up from ``app``.
+    # one level up from `app`.
     candidate = root / "assets"
     if candidate.exists():
         return candidate

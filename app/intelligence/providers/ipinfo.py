@@ -1,6 +1,6 @@
 """ipinfo.io intelligence provider (optional token).
 
-Configured with an API token under Settings > Providers or the ``IPINFO_TOKEN``
+Configured with an API token under Settings > Providers or the `IPINFO_TOKEN`
 environment variable. Without a token it still works at a reduced rate limit.
 """
 

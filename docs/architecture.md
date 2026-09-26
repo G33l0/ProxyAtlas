@@ -1,7 +1,7 @@
 # Architecture
 
-ProxyAtlas is layered so each subsystem — discovery, validation, intelligence,
-classification, monitoring and UI — can evolve independently. Engine code is
+ProxyAtlas is layered so each subsystem - discovery, validation, intelligence,
+classification, monitoring and UI - can evolve independently. Engine code is
 Qt-free and async; the UI drives it through Qt worker threads.
 
 ## Layers
@@ -13,7 +13,7 @@ UI (PyQt6)  ──uses──▶  Workers (QThread + asyncio)  ──drive──�
 ```
 
 ### core/
-Constants, enums (`Protocol`, `ValidationStatus`, `Classification`, …), the JSON
+Constants, enums (`Protocol`, `ValidationStatus`, `Classification`, ...), the JSON
 settings store, filesystem paths, rotating logging with credential redaction, a
 Qt-free pub/sub event bus, structured exceptions, and the pipeline transport
 dataclasses (`Endpoint`, `ProxyCandidate`, `ValidationResult`,
@@ -44,8 +44,8 @@ evidence-based `NetworkClassifier`, and providers (ip-api, ipinfo, offline
 builtin).
 
 ### services/
-The orchestration `ProcessingPipeline` (validation → intelligence →
-classification → quality → batched persistence), the global `JobManager`, the
+The orchestration `ProcessingPipeline` (validation -> intelligence ->
+classification -> quality -> batched persistence), the global `JobManager`, the
 monitoring service, exporters, the credential cipher, the `AppContext`, and the
 `bootstrap` startup sequence.
 
@@ -62,13 +62,13 @@ dialogs, and the DB-backed paginated `ProxyTableModel`.
 ## The pipeline
 
 ```
-Discovery → Normalize → Deduplicate → (queue)
-          → Validate (protocol detect, connect, proxied request, exit IP)
-          → Intelligence (geo/ASN/ISP/hosting)
-          → Classify (evidence-based)
-          → Quality score (explainable)
-          → Persist (identity upsert, tests, history)
-          → Filter / Monitor / Export
+Discovery -> Normalize -> Deduplicate -> (queue)
+          -> Validate (protocol detect, connect, proxied request, exit IP)
+          -> Intelligence (geo/ASN/ISP/hosting)
+          -> Classify (evidence-based)
+          -> Quality score (explainable)
+          -> Persist (identity upsert, tests, history)
+          -> Filter / Monitor / Export
 ```
 
 Fault tolerance is a first-class concern: a single failed proxy or provider is

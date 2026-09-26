@@ -1,8 +1,5 @@
-"""Rotating log configuration with credential redaction.
-
-Creates four rotating log files (application, errors, jobs, discovery) plus a
-console handler. A :class:`RedactionFilter` scrubs anything that looks like a
-password, token or ``user:pass@`` credential so secrets never reach disk.
+"""Rotating logs (application/errors/jobs/discovery) plus console. RedactionFilter
+strips passwords, tokens and user:pass@ before anything hits disk.
 """
 
 from __future__ import annotations

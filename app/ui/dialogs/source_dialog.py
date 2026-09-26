@@ -145,7 +145,7 @@ class SourceDialog(QDialog):
         lay = QHBoxLayout(wrap)
         lay.setContentsMargins(0, 0, 0, 0)
         lay.addWidget(widget)
-        browse = QPushButton("Browse…")
+        browse = QPushButton("Browse...")
         browse.clicked.connect(lambda: self._browse(widget))
         lay.addWidget(browse)
         return wrap

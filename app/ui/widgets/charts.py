@@ -1,8 +1,5 @@
-"""Lightweight custom-painted charts (bar, donut, line).
-
-No external chart dependency — each chart is a QWidget that paints itself using
-the active theme palette, so charts restyle instantly on theme change. Empty
-data renders a friendly placeholder rather than an empty canvas.
+"""Bar, donut and line charts painted by hand, no chart library. Each pulls its
+colors from the theme palette and shows a placeholder when there's no data.
 """
 
 from __future__ import annotations

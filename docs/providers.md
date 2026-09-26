@@ -39,7 +39,7 @@ Built-in providers (`app/intelligence/providers/`):
 | Name      | Kind    | Notes |
 |-----------|---------|-------|
 | `ip-api`  | geoip   | ip-api.com, free, no key |
-| `ipinfo`  | geoip   | ipinfo.io, optional token (`IPINFO_TOKEN` or Settings → Providers) |
+| `ipinfo`  | geoip   | ipinfo.io, optional token (`IPINFO_TOKEN` or Settings -> Providers) |
 | `builtin` | network | offline reverse-DNS + hosting heuristics, always available |
 
 The `IntelligenceManager` runs enabled providers in priority order and merges
@@ -48,7 +48,7 @@ the lookup or the validation pipeline.
 
 ## Credentials & secrets
 
-- Provider API keys are configured under **Settings → Providers** (or via
+- Provider API keys are configured under **Settings -> Providers** (or via
   environment variables) and are **never hard-coded**.
 - Proxy credentials and stored secrets are encrypted at rest (Fernet).
 - Nothing sensitive is written to logs (redaction filter).
@@ -58,7 +58,7 @@ the lookup or the validation pipeline.
 The `mmdb` provider (`app/intelligence/providers/mmdb.py`) resolves geolocation
 and ASN/ISP from local MaxMind GeoLite2 or DB-IP `.mmdb` files using `geoip2`,
 with **no network calls and no rate limits**. Configure it under
-Settings → Providers:
+Settings -> Providers:
 
 | Field | Purpose |
 |-------|---------|

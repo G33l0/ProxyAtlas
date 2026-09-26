@@ -1,4 +1,4 @@
-"""Discovery worker — runs a discovery provider and stores candidates."""
+"""Discovery worker - runs a discovery provider and stores candidates."""
 
 from __future__ import annotations
 

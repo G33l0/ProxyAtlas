@@ -44,7 +44,7 @@ class DiscoveryPage(BasePage):
         run_btn = QPushButton("Run Source")
         run_btn.setObjectName("Primary")
         run_btn.clicked.connect(self._run_source)
-        import_btn = QPushButton("Import File…")
+        import_btn = QPushButton("Import File...")
         import_btn.clicked.connect(self._import_file)
         self.stop_btn = QPushButton("Stop")
         self.stop_btn.setEnabled(False)
@@ -153,12 +153,12 @@ class DiscoveryPage(BasePage):
         worker = DiscoveryWorker(self.ctx, provider, config, self._control)
         worker.item.connect(self._on_candidate)
         worker.progress.connect(lambda snap: self.status_label.setText(
-            f"Discovering… found {snap.get('found', 0)}"))
+            f"Discovering... found {snap.get('found', 0)}"))
         worker.completed.connect(lambda out: self._discovery_done(out, worker))
         worker.failed.connect(lambda e: self._discovery_failed(e, worker))
         self._workers.append(worker)
         self.stop_btn.setEnabled(True)
-        self.status_label.setText("Discovering…")
+        self.status_label.setText("Discovering...")
         self.tabs.setCurrentIndex(1)
         worker.start()
 
@@ -195,7 +195,7 @@ class DiscoveryPage(BasePage):
     def _stop(self) -> None:
         if self._control:
             self._control.stop()
-            self.status_label.setText("Stopping…")
+            self.status_label.setText("Stopping...")
 
     def _import_file(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
@@ -254,11 +254,11 @@ class DiscoveryPage(BasePage):
         profile = self.ctx.settings.get("testing", "default_profile", "standard")
         worker = ValidationWorker(self.ctx, candidates, profile)
         worker.progress.connect(lambda snap: self.status_label.setText(
-            f"Validating… {snap.get('completed',0)}/{snap.get('total',0)} · {snap.get('working',0)} working"))
+            f"Validating... {snap.get('completed',0)}/{snap.get('total',0)} / {snap.get('working',0)} working"))
         worker.completed.connect(lambda res: self._validation_done(res, ids, worker))
         worker.failed.connect(lambda e: self.toast(f"Validation failed: {e}", "error"))
         self._workers.append(worker)
-        self.status_label.setText(f"Validating {len(candidates)} candidate(s)…")
+        self.status_label.setText(f"Validating {len(candidates)} candidate(s)...")
         worker.start()
 
     def _validation_done(self, res, ids, worker) -> None:

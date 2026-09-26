@@ -1,4 +1,4 @@
-"""Export and report workers — run file generation off the GUI thread."""
+"""Export and report workers - run file generation off the GUI thread."""
 
 from __future__ import annotations
 
@@ -42,7 +42,7 @@ class ExportWorker(QThread):
         self.as_report = as_report
         self.include_credentials = include_credentials
 
-    def run(self) -> None:  # noqa: D401 - QThread entry point
+    def run(self) -> None:  # noqa: D401
         try:
             with self.ctx.database.session() as session:
                 proxies = repo.query_proxies(session, self.spec, limit=100000)

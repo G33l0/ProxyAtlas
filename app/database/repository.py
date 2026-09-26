@@ -1,9 +1,6 @@
-"""Repository layer — all database access goes through these functions.
-
-Repositories accept a live :class:`~sqlalchemy.orm.Session` so callers control
-transaction scope. Higher-level services wrap these in ``db.session()``.
-Everything is parameterized (no string SQL), inputs are typed, and duplicate
-proxies collapse on endpoint identity.
+"""All DB access lives here. Functions take a Session so the caller owns the
+transaction; services wrap them in db.session(). Proxies dedupe on
+protocol/host/port.
 """
 
 from __future__ import annotations
@@ -67,16 +64,12 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
-# --------------------------------------------------------------------------
 # Audit
-# --------------------------------------------------------------------------
 def add_audit(session: Session, action: str, detail: str | None = None) -> None:
     session.add(AuditLog(action=action, detail=detail))
 
 
-# --------------------------------------------------------------------------
 # Proxy upsert / query
-# --------------------------------------------------------------------------
 def get_proxy_by_identity(session: Session, endpoint: Endpoint) -> Proxy | None:
     stmt = select(Proxy).where(
         Proxy.protocol == endpoint.protocol.value,
@@ -90,7 +83,7 @@ def delete_proxies_at_hostport_except(
     session: Session, host: str, port: int, keep_protocol: str
 ) -> int:
     """Delete proxy rows at (host, port) whose protocol differs from
-    ``keep_protocol``.
+    `keep_protocol`.
 
     A single host:port socket speaks one protocol, so when auto-detection
     corrects a mislabeled proxy the stale other-protocol row must be removed
@@ -150,9 +143,7 @@ def apply_validation_result(
         proxy.latency = round(result.latency_ms, 2)
     if result.connect_time_ms is not None:
         proxy.connect_latency = round(result.connect_time_ms, 2)
-    # Only overwrite anonymity/DNS when this run actually produced a signal, so a
-    # lighter re-check (Quick/Standard) or a failure never wipes a prior deep
-    # determination.
+    # don't let a lighter re-check clobber a good anonymity/DNS reading
     if result.anonymity != Anonymity.UNKNOWN:
         proxy.anonymity = result.anonymity.value
     if result.dns_status != DnsStatus.UNTESTED:
@@ -288,9 +279,7 @@ def get_credentials(session: Session, proxy: Proxy, cipher) -> tuple[str | None,
     return cipher.decrypt(cred.username_enc), cipher.decrypt(cred.password_enc)
 
 
-# --------------------------------------------------------------------------
 # Discovery result queue
-# --------------------------------------------------------------------------
 def add_discovery_candidate(
     session: Session, candidate: ProxyCandidate, cipher=None
 ) -> tuple[DiscoveryResult, bool]:
@@ -377,9 +366,7 @@ def clear_discovery_results(session: Session) -> int:
     return len(rows)
 
 
-# --------------------------------------------------------------------------
 # Sources
-# --------------------------------------------------------------------------
 def list_sources(session: Session) -> list[ProxySource]:
     return list(session.scalars(select(ProxySource).order_by(ProxySource.name)).all())
 
@@ -416,9 +403,7 @@ def delete_source(session: Session, source_id: int) -> None:
         session.delete(src)
 
 
-# --------------------------------------------------------------------------
 # Collections and saved filters (stored in ApplicationSetting)
-# --------------------------------------------------------------------------
 def _get_setting(session: Session, key: str, default: Any) -> Any:
     row = session.scalars(
         select(ApplicationSetting).where(ApplicationSetting.key == key)
@@ -472,9 +457,7 @@ def delete_saved_filter(session: Session, name: str) -> None:
     _set_setting(session, "saved_filters", filters)
 
 
-# --------------------------------------------------------------------------
 # Monitoring
-# --------------------------------------------------------------------------
 def list_monitoring_jobs(session: Session) -> list[MonitoringJob]:
     return list(session.scalars(select(MonitoringJob).order_by(MonitoringJob.name)).all())
 
@@ -551,9 +534,7 @@ def proxy_tests(session: Session, proxy_id: int, limit: int = 50) -> list[ProxyT
     return list(session.scalars(stmt).all())
 
 
-# --------------------------------------------------------------------------
 # Intelligence caches
-# --------------------------------------------------------------------------
 def get_cached_geo(session: Session, ip: str) -> GeoLocation | None:
     return session.scalars(select(GeoLocation).where(GeoLocation.ip == ip)).first()
 
@@ -590,9 +571,7 @@ def cache_network(session: Session, intel: IntelligenceResult) -> None:
     row.provider = intel.provider
 
 
-# --------------------------------------------------------------------------
 # Export jobs
-# --------------------------------------------------------------------------
 def record_export(
     session: Session, fmt: str, path: str, count: int, filter_json: str | None
 ) -> ExportJob:
@@ -601,9 +580,7 @@ def record_export(
     return job
 
 
-# --------------------------------------------------------------------------
 # Dashboard / statistics
-# --------------------------------------------------------------------------
 def dashboard_stats(session: Session) -> dict[str, Any]:
     total = count_proxies(session)
     working = int(

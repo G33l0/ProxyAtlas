@@ -17,7 +17,7 @@ exportable results.
 
 ProxyAtlas turns raw proxy candidates from many sources into a continuously
 updated database of **validated** proxy endpoints. It clearly separates
-**discovered** candidates from **validated** endpoints — a proxy appearing in a
+**discovered** candidates from **validated** endpoints - a proxy appearing in a
 source is only ever a candidate until it passes the validation pipeline.
 
 It supports multiple proxy **categories** (Residential, Mobile, Datacenter, ISP,
@@ -27,37 +27,37 @@ classification, monitoring and UI subsystems can evolve independently.
 
 ## Features
 
-- **Modular discovery engine** — file (TXT/CSV/JSON), feed URLs, JSON APIs,
+- **Modular discovery engine** - file (TXT/CSV/JSON), feed URLs, JSON APIs,
   custom/plugin adapters, and an **Internet Discovery** module that generates
   candidates over authorized CIDR ranges. Every source feeds the *same*
   validation pipeline.
-- **Real validation engine** — genuine proxy-mediated requests over
+- **Real validation engine** - genuine proxy-mediated requests over
   HTTP/HTTPS/SOCKS4/SOCKS5 with exit-IP detection, latency, reliability,
   anonymity and DNS analysis. A responding TCP port is never enough to be
   "working".
-- **Validation profiles** — Quick / Standard / Deep, plus custom profiles.
-- **Controlled concurrency** — bounded async workers, never a thread per proxy;
+- **Validation profiles** - Quick / Standard / Deep, plus custom profiles.
+- **Controlled concurrency** - bounded async workers, never a thread per proxy;
   the GUI thread never blocks. Live totals, success rate, latency and throughput.
 - **Pause / Resume / Stop** for every major job.
-- **IP intelligence** — pluggable providers (ip-api.com, ipinfo.io, and an
+- **IP intelligence** - pluggable providers (ip-api.com, ipinfo.io, and an
   offline reverse-DNS/hosting-heuristic provider) for geolocation, ASN, ISP,
   organization and hosting indicators.
-- **Evidence-based classification** — never "not datacenter = residential";
+- **Evidence-based classification** - never "not datacenter = residential";
   every verdict stores its confidence and supporting evidence.
-- **Explainable quality scoring** — connectivity, latency, reliability,
+- **Explainable quality scoring** - connectivity, latency, reliability,
   stability and freshness components you can inspect.
 - **Persistent SQLite database** (SQLAlchemy + Alembic) with identity-based
   deduplication and indexes.
-- **Advanced filtering** — protocol, country, ISP, ASN, classification,
+- **Advanced filtering** - protocol, country, ISP, ASN, classification,
   anonymity, latency, reliability, uptime, score, source, and free-text search,
   combinable with AND/OR, saveable as filters and **collections**.
-- **Professional results table** — sorting, searching, multi-selection, column
+- **Professional results table** - sorting, searching, multi-selection, column
   visibility, context menu, copy/re-test/export/tag/details, pagination.
-- **Monitoring** — track collections/filters/proxies on a schedule with history
+- **Monitoring** - track collections/filters/proxies on a schedule with history
   charts.
-- **Reports & exports** — TXT (configurable line format), CSV, JSON and rich,
+- **Reports & exports** - TXT (configurable line format), CSV, JSON and rich,
   sanitized HTML reports, generated in background workers.
-- **Three themes** — Light, Dark, Midnight — switchable live and persisted.
+- **Three themes** - Light, Dark, Midnight - switchable live and persisted.
 - **CLI** for headless automation.
 
 ## Architecture
@@ -106,7 +106,7 @@ classification, monitoring, exports and stats via `proxyatlas --help`.
 
 ## Running on Termux (Android)
 
-ProxyAtlas runs headlessly on **Termux** — the full engine (discovery,
+ProxyAtlas runs headlessly on **Termux** - the full engine (discovery,
 validation over HTTP/HTTPS/SOCKS4/SOCKS5, intelligence, classification, exports)
 works from the command line. The PyQt6 GUI is desktop-only; on Termux you use
 the CLI, which is fully featured.
@@ -191,7 +191,7 @@ folder. Icons, themes, migrations and report templates are bundled.
 ## Provider configuration
 
 Configure discovery sources under **Sources**, and intelligence provider
-credentials under **Settings → Providers**. API keys are **never** hard-coded
+credentials under **Settings -> Providers**. API keys are **never** hard-coded
 and **never** written to logs; proxy credentials are encrypted at rest. See
 [`docs/providers.md`](docs/providers.md).
 
@@ -203,7 +203,7 @@ Internet Discovery module.
 ## Database
 
 SQLite via SQLAlchemy with Alembic migrations. To keep large datasets off the
-system disk, point **Settings → Database** at an external drive or custom folder
+system disk, point **Settings -> Database** at an external drive or custom folder
 (with a one-click **Relocate now**); ProxyAtlas falls back to the default
 location gracefully if the drive is unavailable at launch. Location and schema
 are described in [`docs/database.md`](docs/database.md).
@@ -211,7 +211,7 @@ are described in [`docs/database.md`](docs/database.md).
 ## Themes
 
 Light, Dark and Midnight, defined centrally in `app/ui/theme.py`. Switch under
-**Settings → Appearance** or the About/Settings pages; the choice persists.
+**Settings -> Appearance** or the About/Settings pages; the choice persists.
 
 ## Plugin architecture
 
@@ -222,15 +222,15 @@ loader. See [`docs/development.md`](docs/development.md).
 
 ## Troubleshooting
 
-- **Qt fails to start on Linux** — install the Qt runtime libraries listed above,
+- **Qt fails to start on Linux** - install the Qt runtime libraries listed above,
   or set `QT_QPA_PLATFORM=offscreen` for headless use.
-- **No intelligence data** — check connectivity and Settings → Providers; the
+- **No intelligence data** - check connectivity and Settings -> Providers; the
   offline provider still supplies reverse-DNS/hosting hints.
-- **Nothing validates as working** — confirm your validation endpoints under
-  Settings → Testing are reachable from your network.
+- **Nothing validates as working** - confirm your validation endpoints under
+  Settings -> Testing are reachable from your network.
 - **Logs** live in the data directory under `logs/` (`application.log`,
   `errors.log`, `jobs.log`, `discovery.log`). Credentials are redacted.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).

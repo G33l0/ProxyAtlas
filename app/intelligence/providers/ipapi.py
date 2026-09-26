@@ -1,7 +1,5 @@
-"""ip-api.com intelligence provider (free, no API key).
-
-Returns geolocation, ASN, ISP, organization and a hosting flag. Network
-failures are swallowed and reported via provider status — they never raise.
+"""ip-api.com lookup (free, no key): geo, ASN, ISP, org and a hosting flag.
+Network errors are swallowed and surfaced through provider status.
 """
 
 from __future__ import annotations
@@ -47,7 +45,7 @@ class IpApiProvider(IntelligenceProvider):
             async with httpx.AsyncClient(timeout=8.0) as client:
                 resp = await client.get(url)
             data = resp.json()
-        except Exception:  # noqa: BLE001 - provider failures are non-fatal
+        except Exception:  # noqa: BLE001
             return result
 
         if not isinstance(data, dict) or data.get("status") != "success":

@@ -1,8 +1,5 @@
-"""Interfaces for IP intelligence providers.
-
-Every provider implements :class:`IntelligenceProvider`. The manager runs them
-in priority order and merges non-empty fields, so a provider failure never
-stops the pipeline.
+"""IntelligenceProvider interface. The manager runs them by priority and merges
+non-empty fields, so one provider failing doesn't stop a lookup.
 """
 
 from __future__ import annotations
@@ -49,5 +46,5 @@ class IntelligenceProvider(abc.ABC):
 
     @abc.abstractmethod
     async def lookup(self, ip: str) -> IntelligenceResult:
-        """Return intelligence for ``ip``. Should not raise on lookup failure."""
+        """Return intelligence for `ip`. Should not raise on lookup failure."""
         ...

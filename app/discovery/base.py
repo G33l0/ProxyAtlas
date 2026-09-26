@@ -1,9 +1,6 @@
-"""Discovery provider interface.
-
-Every discovery source implements :class:`DiscoveryProvider`. Providers yield
-:class:`ProxyCandidate` objects that all enter the *same* validation pipeline —
-no provider performs its own validation. New providers can be registered with
-the manager without modifying the core engine.
+"""DiscoveryProvider interface. A provider just yields ProxyCandidates; they
+all go through the same validation pipeline, no provider validates its own.
+New providers register with the manager, no core changes needed.
 """
 
 from __future__ import annotations

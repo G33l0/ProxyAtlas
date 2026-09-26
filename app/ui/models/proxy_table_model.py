@@ -1,9 +1,6 @@
-"""Database-backed proxy table model with pagination.
-
-The model holds only the current page of rows (as detached dicts), never the
-whole dataset, so the table stays responsive with very large databases. Sorting
-and filtering are performed by the database via the owning page, which calls
-:meth:`set_rows`.
+"""Table model that holds one page of rows (plain dicts), not the whole DB, so
+the table stays quick on big datasets. The page does the sorting/filtering in
+SQL and calls set_rows.
 """
 
 from __future__ import annotations
@@ -147,7 +144,7 @@ class ProxyTableModel(QAbstractTableModel):
 
     def _display(self, attr: str, value: Any) -> str:
         if value is None or value == "":
-            return "—" if attr not in ("latency", "reliability", "uptime", "score") else "—"
+            return "-" if attr not in ("latency", "reliability", "uptime", "score") else "-"
         if attr == "status":
             return STATUS_LABELS.get(ValidationStatus.from_value(value, ValidationStatus.UNKNOWN), str(value))
         if attr == "protocol":

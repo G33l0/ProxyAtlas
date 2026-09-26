@@ -1,8 +1,6 @@
-"""Database engine and session management.
-
-Provides a thread-safe :class:`Database` wrapper around a SQLAlchemy engine
-with SQLite tuned for concurrent read/write (WAL, foreign keys, busy timeout).
-Sessions are short-lived and obtained via a context manager.
+"""Database wrapper over a SQLAlchemy engine, SQLite tuned for concurrent
+read/write (WAL, foreign keys, busy timeout). Grab a session from the context
+manager and keep it short.
 """
 
 from __future__ import annotations

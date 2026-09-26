@@ -1,17 +1,7 @@
-"""Robust proxy string parser.
-
-Accepts the common real-world formats:
-
-* ``IP:PORT``
-* ``IP:PORT:USERNAME:PASSWORD``
-* ``PROTOCOL://IP:PORT``
-* ``PROTOCOL://USERNAME:PASSWORD@IP:PORT``
-* Bracketed IPv6: ``[2001:db8::1]:8080`` and ``proto://[..]:port``
-* Host names (``proxy.example.com:3128``)
-
-Malformed records raise :class:`ParseError`; callers decide whether to skip.
-The parser never executes input and never raises anything other than
-``ParseError`` for bad data.
+"""Parse the proxy formats you actually see in the wild: IP:PORT,
+IP:PORT:USER:PASS, PROTO://IP:PORT, PROTO://USER:PASS@IP:PORT, bracketed IPv6
+and hostnames. Bad input raises ParseError (and only ParseError); nothing is
+ever executed.
 """
 
 from __future__ import annotations
@@ -58,7 +48,7 @@ def _valid_host(host: str) -> str:
         return host
     except ValueError:
         pass
-    # A dotted all-numeric token is an IP address, not a hostname — reject it
+    # A dotted all-numeric token is an IP address, not a hostname - reject it
     # if it is not a valid one (e.g. 999.999.999.999) rather than treating it
     # as a hostname.
     labels = host.split(".")
@@ -70,7 +60,7 @@ def _valid_host(host: str) -> str:
 
 
 def _split_hostport(text: str) -> tuple[str, str]:
-    """Split ``host:port`` handling bracketed IPv6."""
+    """Split `host:port` handling bracketed IPv6."""
     text = text.strip()
     if text.startswith("["):
         end = text.find("]")
@@ -96,9 +86,9 @@ def parse_proxy(
     raw: str,
     default_protocol: Protocol = Protocol.HTTP,
 ) -> Endpoint:
-    """Parse a single proxy record into an :class:`Endpoint`.
+    """Parse a single proxy record into an `Endpoint`.
 
-    Raises :class:`ParseError` on malformed input.
+    Raises `ParseError` on malformed input.
     """
     if raw is None:
         raise ParseError("None is not a proxy record")
@@ -166,8 +156,8 @@ def parse_many(
 ) -> tuple[list[Endpoint], list[tuple[str, str]]]:
     """Parse many records.
 
-    Returns ``(endpoints, errors)`` where errors is a list of
-    ``(raw_line, message)`` for records that failed. Never raises.
+    Returns `(endpoints, errors)` where errors is a list of
+    `(raw_line, message)` for records that failed. Never raises.
     """
     endpoints: list[Endpoint] = []
     errors: list[tuple[str, str]] = []
