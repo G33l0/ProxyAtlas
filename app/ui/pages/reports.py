@@ -82,6 +82,7 @@ class ReportsPage(BasePage):
         worker = ExportWorker(
             self.ctx, spec, opts["path"], opts["fmt"],
             working_only=opts["working_only"], txt_format=opts["txt_format"], as_report=as_report,
+            include_credentials=opts.get("include_credentials", False),
         )
         worker.completed.connect(lambda info: self._done(info, worker))
         worker.failed.connect(lambda e: self.toast(f"Generation failed: {e}", "error"))

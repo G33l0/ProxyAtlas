@@ -25,16 +25,35 @@ EXPORT_COLUMNS = [
     "reliability", "uptime", "score", "source", "last_checked_at",
 ]
 
+# Appended only when the caller explicitly opts in to credential export.
+CREDENTIAL_COLUMNS = ["username", "password"]
 
-def proxy_to_row(proxy: Any) -> dict[str, Any]:
-    """Convert a Proxy ORM object to a serializable dict."""
+
+def proxy_to_row(proxy: Any, cipher: Any = None, include_credentials: bool = False) -> dict[str, Any]:
+    """Convert a Proxy ORM object to a serializable dict.
+
+    Credentials are included only when ``include_credentials`` is True *and* a
+    ``cipher`` is supplied to decrypt them — an explicit, opt-in action. By
+    default no credentials are written (see SECURITY.md).
+    """
     def val(name: str) -> Any:
         v = getattr(proxy, name, None)
         if isinstance(v, datetime):
             return v.isoformat()
         return v
 
-    return {col: val(col) for col in EXPORT_COLUMNS}
+    row = {col: val(col) for col in EXPORT_COLUMNS}
+    if include_credentials and cipher is not None and getattr(proxy, "credential_reference", None):
+        try:
+            # proxy.credential lazy-loads within the caller's open session.
+            cred = getattr(proxy, "credential", None)
+            if cred is not None:
+                row["username"] = cipher.decrypt(cred.username_enc)
+                row["password"] = cipher.decrypt(cred.password_enc)
+        except Exception:  # noqa: BLE001 - never fail an export over creds
+            row["username"] = None
+            row["password"] = None
+    return row
 
 
 def _only_working(rows: list[dict[str, Any]], working_only: bool) -> list[dict[str, Any]]:
@@ -58,21 +77,37 @@ def export_txt(
     lines: list[str] = []
     for r in rows:
         host, port, proto = r.get("host"), r.get("port"), r.get("protocol")
+        user, pw = r.get("username"), r.get("password")
         if line_format == "protocol_url":
-            lines.append(f"{proto}://{host}:{port}")
+            if user:
+                auth = f"{user}:{pw}@" if pw else f"{user}@"
+                lines.append(f"{proto}://{auth}{host}:{port}")
+            else:
+                lines.append(f"{proto}://{host}:{port}")
         else:  # ip_port (default)
-            lines.append(f"{host}:{port}")
+            if user:
+                lines.append(f"{host}:{port}:{user}:{pw or ''}")
+            else:
+                lines.append(f"{host}:{port}")
     text = "\n".join(lines) + ("\n" if lines else "")
     Path(path).write_text(text, encoding="utf-8")
     return len(rows)
+
+
+def _columns(rows: list[dict[str, Any]]) -> list[str]:
+    """Export columns, extended with credential columns only if rows carry them."""
+    if any(r.get("username") for r in rows):
+        return EXPORT_COLUMNS + CREDENTIAL_COLUMNS
+    return EXPORT_COLUMNS
 
 
 def export_csv(
     rows: Iterable[dict[str, Any]], path: str | Path, working_only: bool = False
 ) -> int:
     rows = _only_working(list(rows), working_only)
+    columns = _columns(rows)
     buf = io.StringIO()
-    writer = csv.DictWriter(buf, fieldnames=EXPORT_COLUMNS, extrasaction="ignore")
+    writer = csv.DictWriter(buf, fieldnames=columns, extrasaction="ignore")
     writer.writeheader()
     for r in rows:
         writer.writerow(r)

@@ -37,6 +37,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "concurrency": 40,
         "retries": 1,
         "retry_backoff": 1.5,
+        "protocol_autodetect": False,
         "default_profile": "standard",
         "validation_endpoints": [
             "https://httpbin.org/ip",

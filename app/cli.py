@@ -87,17 +87,26 @@ def _cmd_validate(ctx: AppContext, profile: str, limit: int | None) -> int:
     return asyncio.run(run())
 
 
-def _cmd_export(ctx: AppContext, path: str, fmt: str | None, working_only: bool) -> int:
+def _cmd_export(
+    ctx: AppContext, path: str, fmt: str | None, working_only: bool,
+    include_credentials: bool = False,
+) -> int:
     from app.services.exporters import export_rows, proxy_to_row
 
     fmt = fmt or path.rsplit(".", 1)[-1].lower()
     spec = FilterSpec()
     if working_only:
         spec.add("status", "eq", "working")
+    cipher = ctx.cipher if include_credentials else None
     with ctx.database.session() as session:
-        rows = [proxy_to_row(p) for p in repo.query_proxies(session, spec, limit=1_000_000)]
+        rows = [
+            proxy_to_row(p, cipher, include_credentials)
+            for p in repo.query_proxies(session, spec, limit=1_000_000)
+        ]
         count = export_rows(rows, path, fmt, working_only=working_only)
         repo.record_export(session, fmt, path, count, None)
+    if include_credentials:
+        print("WARNING: credentials written in plaintext to the export file.")
     print(f"Exported {count} prox{'y' if count == 1 else 'ies'} to {path} ({fmt}).")
     return 0
 
@@ -130,6 +139,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", dest="fmt", help="Export format (txt/csv/json/html)")
     parser.add_argument("--limit", type=int, help="Limit number of candidates to validate")
     parser.add_argument("--working-only", action="store_true", help="Export only working proxies")
+    parser.add_argument("--include-credentials", action="store_true",
+                        help="Include proxy credentials in the export (PLAINTEXT — use with care)")
     parser.add_argument("--gui", action="store_true", help="Launch the graphical interface")
     return parser
 
@@ -156,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.validate:
         return _cmd_validate(ctx, args.profile, args.limit)
     if args.export_path:
-        return _cmd_export(ctx, args.export_path, args.fmt, args.working_only)
+        return _cmd_export(ctx, args.export_path, args.fmt, args.working_only, args.include_credentials)
     if args.stats:
         return _cmd_stats(ctx)
 

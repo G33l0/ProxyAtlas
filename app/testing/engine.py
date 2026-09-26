@@ -14,7 +14,7 @@ import threading
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 
-from app.core.enums import ValidationStatus
+from app.core.enums import Protocol, ValidationStatus
 from app.core.models import Endpoint, ValidationResult
 from app.testing.profiles import ValidationProfile
 from app.testing.validator import detect_public_ip, validate_proxy
@@ -107,12 +107,18 @@ class ValidationEngine:
         judge_endpoint: str | None,
         concurrency: int = 40,
         control: JobControl | None = None,
+        retries: int = 0,
+        retry_backoff: float = 0.0,
+        autodetect_protocols: bool = False,
     ) -> None:
         self.profile = profile
         self.validation_endpoints = validation_endpoints
         self.judge_endpoint = judge_endpoint
         self.concurrency = max(1, int(concurrency))
         self.control = control or JobControl()
+        self.retries = max(0, int(retries))
+        self.retry_backoff = max(0.0, float(retry_backoff))
+        self.autodetect_protocols = bool(autodetect_protocols)
         self.stats = ValidationStats()
 
     async def run(
@@ -152,6 +158,9 @@ class ValidationEngine:
                         self.validation_endpoints,
                         self.judge_endpoint,
                         real_ip,
+                        retries=self.retries,
+                        retry_backoff=self.retry_backoff,
+                        protocols=self._protocols_for(ep),
                     )
                 except Exception as exc:  # noqa: BLE001 - safety net
                     logger.exception("Validator crashed for %s", ep.identity)
@@ -177,6 +186,21 @@ class ValidationEngine:
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
         return results
+
+    def _protocols_for(self, ep: Endpoint) -> list[Protocol] | None:
+        """Return the ordered protocol list to try for an endpoint.
+
+        When auto-detection is enabled the endpoint's own protocol is always
+        tried first and returned immediately if it genuinely works, so a
+        correctly-labeled proxy is never reclassified; only when its own
+        protocol fails are the others attempted (correcting a mislabeled or
+        scheme-less candidate). Returns ``None`` (single protocol) when disabled.
+        """
+        if not self.autodetect_protocols:
+            return None
+        from app.testing.validator import _AUTODETECT_ORDER
+
+        return [ep.protocol] + [p for p in _AUTODETECT_ORDER if p != ep.protocol]
 
     def _tally(self, res: ValidationResult) -> None:
         if res.status == ValidationStatus.WORKING:

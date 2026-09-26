@@ -37,6 +37,8 @@ class AppContext:
             "timeout": section.get("timeout", 12.0),
             "concurrency": section.get("concurrency", 40),
             "retries": section.get("retries", 1),
+            "retry_backoff": section.get("retry_backoff", 1.5),
+            "protocol_autodetect": section.get("protocol_autodetect", False),
             "validation_endpoints": section.get("validation_endpoints", []),
             "judge_endpoint": section.get("judge_endpoint"),
             "default_profile": section.get("default_profile", "standard"),
