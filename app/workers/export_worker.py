@@ -29,6 +29,7 @@ class ExportWorker(QThread):
         working_only: bool = False,
         txt_format: str = "ip_port",
         as_report: bool = False,
+        include_credentials: bool = False,
         parent=None,
     ) -> None:
         super().__init__(parent)
@@ -39,12 +40,16 @@ class ExportWorker(QThread):
         self.working_only = working_only
         self.txt_format = txt_format
         self.as_report = as_report
+        self.include_credentials = include_credentials
 
     def run(self) -> None:  # noqa: D401 - QThread entry point
         try:
             with self.ctx.database.session() as session:
                 proxies = repo.query_proxies(session, self.spec, limit=100000)
-                rows: list[dict[str, Any]] = [proxy_to_row(p) for p in proxies]
+                cipher = self.ctx.cipher if self.include_credentials else None
+                rows: list[dict[str, Any]] = [
+                    proxy_to_row(p, cipher, self.include_credentials) for p in proxies
+                ]
                 if self.as_report:
                     count = write_report(rows, self.path, self.fmt, "ProxyAtlas Report")
                 else:

@@ -87,17 +87,26 @@ def _cmd_validate(ctx: AppContext, profile: str, limit: int | None) -> int:
     return asyncio.run(run())
 
 
-def _cmd_export(ctx: AppContext, path: str, fmt: str | None, working_only: bool) -> int:
+def _cmd_export(
+    ctx: AppContext, path: str, fmt: str | None, working_only: bool,
+    include_credentials: bool = False,
+) -> int:
     from app.services.exporters import export_rows, proxy_to_row
 
     fmt = fmt or path.rsplit(".", 1)[-1].lower()
     spec = FilterSpec()
     if working_only:
         spec.add("status", "eq", "working")
+    cipher = ctx.cipher if include_credentials else None
     with ctx.database.session() as session:
-        rows = [proxy_to_row(p) for p in repo.query_proxies(session, spec, limit=1_000_000)]
+        rows = [
+            proxy_to_row(p, cipher, include_credentials)
+            for p in repo.query_proxies(session, spec, limit=1_000_000)
+        ]
         count = export_rows(rows, path, fmt, working_only=working_only)
         repo.record_export(session, fmt, path, count, None)
+    if include_credentials:
+        print("WARNING: credentials written in plaintext to the export file.")
     print(f"Exported {count} prox{'y' if count == 1 else 'ies'} to {path} ({fmt}).")
     return 0
 
@@ -130,6 +139,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", dest="fmt", help="Export format (txt/csv/json/html)")
     parser.add_argument("--limit", type=int, help="Limit number of candidates to validate")
     parser.add_argument("--working-only", action="store_true", help="Export only working proxies")
+    parser.add_argument("--include-credentials", action="store_true",
+                        help="Include proxy credentials in the export (PLAINTEXT — use with care)")
     parser.add_argument("--gui", action="store_true", help="Launch the graphical interface")
     return parser
 
@@ -142,7 +153,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ProxyAtlas {__version__}")
         return 0
 
-    if args.gui or (argv is None and len(sys.argv) == 1):
+    wants_gui = args.gui or (argv is None and len(sys.argv) == 1)
+    if wants_gui:
+        import importlib.util
+
+        if importlib.util.find_spec("PyQt6") is None:
+            # PyQt6 is unavailable (e.g. Termux / headless). Guide the user to the
+            # CLI instead of crashing.
+            print(
+                "The graphical interface requires PyQt6, which is not installed "
+                "in this environment (e.g. Termux/headless).\n"
+                "ProxyAtlas still works headlessly — use the CLI, for example:\n"
+                "  proxyatlas --import proxies.txt\n"
+                "  proxyatlas --validate --profile quick\n"
+                "  proxyatlas --export working.txt --working-only\n"
+                "  proxyatlas --stats\n",
+                file=sys.stderr,
+            )
+            if args.gui:
+                return 2
+            parser.print_help()
+            return 0
         from app.main import main as gui_main
 
         return gui_main()
@@ -156,7 +187,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.validate:
         return _cmd_validate(ctx, args.profile, args.limit)
     if args.export_path:
-        return _cmd_export(ctx, args.export_path, args.fmt, args.working_only)
+        return _cmd_export(ctx, args.export_path, args.fmt, args.working_only, args.include_credentials)
     if args.stats:
         return _cmd_stats(ctx)
 

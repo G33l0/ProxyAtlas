@@ -64,11 +64,17 @@ class ProcessingPipeline:
     ) -> PipelineResult:
         candidates = list(candidates)
         by_identity = {c.identity: c for c in candidates}
+        # Fallback lookup ignoring protocol, so a candidate whose protocol was
+        # corrected by auto-detection still maps back to its original source.
+        by_hostport = {(c.endpoint.host, c.endpoint.port): c for c in candidates}
         endpoints = [c.endpoint for c in candidates]
 
         val_endpoints = self.settings.get("validation_endpoints") or []
         judge = self.settings.get("judge_endpoint")
         conc = concurrency or int(self.settings.get("concurrency", 40))
+        retries = int(self.settings.get("retries", 0) or 0)
+        retry_backoff = float(self.settings.get("retry_backoff", 0.0) or 0.0)
+        autodetect = bool(self.settings.get("protocol_autodetect", False))
 
         engine = ValidationEngine(
             profile=profile,
@@ -76,6 +82,9 @@ class ProcessingPipeline:
             judge_endpoint=judge,
             concurrency=conc,
             control=control,
+            retries=retries,
+            retry_backoff=retry_backoff,
+            autodetect_protocols=autodetect,
         )
 
         results = await engine.run(endpoints, on_result=on_result, on_progress=on_progress)
@@ -104,7 +113,18 @@ class ProcessingPipeline:
             for res in results:
                 cand = by_identity.get(res.endpoint.identity)
                 if cand is None:
-                    cand = ProxyCandidate(endpoint=res.endpoint, source="validation")
+                    original = by_hostport.get((res.endpoint.host, res.endpoint.port))
+                    # Auto-detection corrected the protocol: adopt the detected
+                    # one, preserve the original source, and remove any stale
+                    # row that still carries the mislabeled protocol so the same
+                    # host:port never appears twice.
+                    cand = ProxyCandidate(
+                        endpoint=res.endpoint,
+                        source=original.source if original else "validation",
+                    )
+                    repo.delete_proxies_at_hostport_except(
+                        session, res.endpoint.host, res.endpoint.port, res.endpoint.protocol.value
+                    )
                 proxy = repo.upsert_proxy_from_candidate(session, cand, self.cipher)
                 repo.apply_validation_result(session, proxy, res, profile.name)
 

@@ -43,6 +43,23 @@ class ExportDialog(QDialog):
         self.working_only.setChecked(True)
         form.addRow("", self.working_only)
 
+        if not as_report:
+            self.include_credentials = QCheckBox("Include credentials (plaintext)")
+            self.include_credentials.setChecked(False)
+            form.addRow("", self.include_credentials)
+            from PyQt6.QtWidgets import QLabel
+
+            warn = QLabel(
+                "⚠ Writes proxy usernames/passwords in clear text to the export "
+                "file. Only enable if you understand the risk and store the file "
+                "securely."
+            )
+            warn.setWordWrap(True)
+            warn.setStyleSheet("color:#f59e0b; font-size:11px;")
+            form.addRow("", warn)
+        else:
+            self.include_credentials = None
+
         path_row = QHBoxLayout()
         self.path_edit = QLineEdit()
         default_name = "proxyatlas_report.html" if as_report else "proxyatlas_export.txt"
@@ -84,4 +101,7 @@ class ExportDialog(QDialog):
             "working_only": self.working_only.isChecked(),
             "txt_format": self.txt_format.currentText(),
             "as_report": self._as_report,
+            "include_credentials": bool(
+                self.include_credentials and self.include_credentials.isChecked()
+            ),
         }

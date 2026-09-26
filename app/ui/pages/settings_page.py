@@ -117,7 +117,9 @@ class SettingsPage(BasePage):
         f = self._tab("Testing")
         f.addRow("Timeout (s)", self._dspin("testing.timeout", self._get("testing", "timeout", 12.0), 1, 120))
         f.addRow("Concurrency", self._spin("testing.concurrency", self._get("testing", "concurrency", 40), 1, 500))
-        f.addRow("Retries", self._spin("testing.retries", self._get("testing", "retries", 1), 0, 10))
+        f.addRow("Retries", self._spin("testing.retries", self._get("testing", "retries", 0), 0, 10))
+        f.addRow("Retry backoff (s)", self._dspin("testing.retry_backoff", self._get("testing", "retry_backoff", 1.5), 0, 60, 0.5))
+        f.addRow("Protocol auto-detect", self._combo("testing.protocol_autodetect", ["true", "false"], str(self._get("testing", "protocol_autodetect", False)).lower()))
         f.addRow("Default profile", self._combo("testing.default_profile", ["quick", "standard", "deep"], self._get("testing", "default_profile", "standard")))
         f.addRow("Validation endpoints", self._textarea("testing.validation_endpoints", self._get("testing", "validation_endpoints", [])))
         f.addRow("Judge endpoint", self._line("testing.judge_endpoint", self._get("testing", "judge_endpoint", "")))
@@ -140,6 +142,21 @@ class SettingsPage(BasePage):
         f.addRow("Enable ipinfo.io", self._combo("providers.ipinfo.enabled", ["true", "false"], str(ipinfo.get("enabled", False)).lower()))
         ipapi = providers.get("ip-api", {})
         f.addRow("Enable ip-api.com", self._combo("providers.ip-api.enabled", ["true", "false"], str(ipapi.get("enabled", True)).lower()))
+
+        # Offline GeoIP (MMDB) — runs first when configured; no network/rate limits.
+        mmdb = providers.get("mmdb", {})
+        f.addRow("Offline GeoIP city/country .mmdb", self._line("providers.mmdb.city_db", mmdb.get("city_db", "")))
+        f.addRow("Offline GeoIP ASN .mmdb", self._line("providers.mmdb.asn_db", mmdb.get("asn_db", "")))
+        f.addRow("Enable offline GeoIP", self._combo("providers.mmdb.enabled", ["true", "false"], str(mmdb.get("enabled", False)).lower()))
+        from PyQt6.QtWidgets import QLabel
+
+        mmdb_hint = QLabel(
+            "Supply GeoLite2/DB-IP .mmdb files (requires the 'geoip2' package). "
+            "Offline lookups avoid network calls and rate limits."
+        )
+        mmdb_hint.setObjectName("StatLabel")
+        mmdb_hint.setWordWrap(True)
+        f.addRow("", mmdb_hint)
 
     def _build_database(self):
         from PyQt6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QWidget

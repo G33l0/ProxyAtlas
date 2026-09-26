@@ -86,6 +86,25 @@ def get_proxy_by_identity(session: Session, endpoint: Endpoint) -> Proxy | None:
     return session.scalars(stmt).first()
 
 
+def delete_proxies_at_hostport_except(
+    session: Session, host: str, port: int, keep_protocol: str
+) -> int:
+    """Delete proxy rows at (host, port) whose protocol differs from
+    ``keep_protocol``.
+
+    A single host:port socket speaks one protocol, so when auto-detection
+    corrects a mislabeled proxy the stale other-protocol row must be removed
+    rather than left behind as a duplicate.
+    """
+    stmt = select(Proxy).where(
+        Proxy.host == host, Proxy.port == port, Proxy.protocol != keep_protocol
+    )
+    rows = list(session.scalars(stmt).all())
+    for row in rows:
+        session.delete(row)
+    return len(rows)
+
+
 def upsert_proxy_from_candidate(
     session: Session, candidate: ProxyCandidate, cipher=None
 ) -> Proxy:

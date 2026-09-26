@@ -36,12 +36,21 @@ class IntelligenceManager:
 
     def register_defaults(self, config: dict | None = None) -> None:
         config = config or {}
+        # Offline MMDB provider runs first (priority 10) when configured.
+        from app.intelligence.providers.mmdb import MmdbProvider
+
+        mmdb = MmdbProvider()
+        mmdb_cfg = config.get("mmdb", {})
+        mmdb.configure(mmdb_cfg)
         ipapi = IpApiProvider()
         ipapi.configure(config.get("ip-api", {}))
         ipinfo = IpInfoProvider()
         ipinfo.configure(config.get("ipinfo", {}))
         builtin = BuiltinIntelligenceProvider()
         builtin.configure(config.get("builtin", {"reverse_dns": True}))
+        # Enable MMDB only when a database path is configured.
+        mmdb_enabled = bool(mmdb_cfg.get("city_db") or mmdb_cfg.get("country_db") or mmdb_cfg.get("asn_db"))
+        self.register(mmdb, enabled=mmdb_cfg.get("enabled", mmdb_enabled))
         # ipinfo disabled by default unless a token is configured.
         self.register(ipapi, enabled=config.get("ip-api", {}).get("enabled", True))
         self.register(ipinfo, enabled=config.get("ipinfo", {}).get("enabled", False))

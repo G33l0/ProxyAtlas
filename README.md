@@ -93,6 +93,67 @@ pip install -r requirements.txt
 On Linux you may also need Qt runtime libraries:
 `sudo apt-get install libegl1 libgl1 libxkbcommon0 libfontconfig1`.
 
+### Headless / CLI-only (servers, containers, Termux)
+
+Environments without a Qt display use the headless requirements (no PyQt6):
+
+```bash
+pip install -r requirements-cli.txt
+```
+
+Everything except the GUI works: discovery, validation, intelligence,
+classification, monitoring, exports and stats via `proxyatlas --help`.
+
+## Running on Termux (Android)
+
+ProxyAtlas runs headlessly on **Termux** — the full engine (discovery,
+validation over HTTP/HTTPS/SOCKS4/SOCKS5, intelligence, classification, exports)
+works from the command line. The PyQt6 GUI is desktop-only; on Termux you use
+the CLI, which is fully featured.
+
+```bash
+# 1. Install Termux from F-Droid, then update and install build prerequisites
+pkg update && pkg upgrade
+pkg install python git rust clang openssl
+# (Rust + OpenSSL are needed to build the 'cryptography' package.)
+
+# 2. Get ProxyAtlas
+git clone https://github.com/G33l0/ProxyAtlas.git
+cd ProxyAtlas
+
+# 3. Install the headless dependencies
+pip install -r requirements-cli.txt
+
+# 4. Use it
+python run.py --help
+python run.py --import proxies.txt          # import a list into the queue
+python run.py --validate --profile quick    # validate the queue for real
+python run.py --export working.txt --working-only
+python run.py --stats
+```
+
+**Storing the database on shared storage / SD card (Termux):**
+
+```bash
+termux-setup-storage        # grant storage access (one time)
+# Point ProxyAtlas at shared storage so the DB isn't in the app sandbox:
+python run.py --stats       # creates config first
+# then edit the database path, or from Python:
+python - <<'PY'
+from app.core.config import Settings
+from app.core.paths import paths
+s = Settings.load(paths.config_path)
+s.set("database", "path", "/data/data/com.termux/files/home/storage/shared/ProxyAtlas")
+s.save()
+print("DB path set to shared storage")
+PY
+```
+
+If a launch with no arguments (or `--gui`) is attempted on Termux, ProxyAtlas
+detects that PyQt6 is unavailable and prints CLI usage instead of failing.
+
+See [`docs/termux.md`](docs/termux.md) for troubleshooting.
+
 ## Running
 
 ```bash

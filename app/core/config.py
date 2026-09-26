@@ -35,8 +35,9 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "testing": {
         "timeout": 12.0,
         "concurrency": 40,
-        "retries": 1,
+        "retries": 0,  # opt-in; >0 retries transient failures with backoff
         "retry_backoff": 1.5,
+        "protocol_autodetect": False,
         "default_profile": "standard",
         "validation_endpoints": [
             "https://httpbin.org/ip",

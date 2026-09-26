@@ -149,14 +149,90 @@ def _categorize(exc: Exception) -> tuple[ValidationStatus, str, str]:
     return ValidationStatus.FAILED, "unknown", f"{name}: {exc}"[:300]
 
 
+# Failure categories worth retrying (genuinely transient). A refused connection
+# ("connect") and authentication are definitive, so they are not retried.
+_RETRYABLE_CATEGORIES = {"timeout", "protocol", "unknown", "http_error", "no_exit_ip", "dns"}
+
+# Order tried during protocol auto-detection, after the candidate's own protocol.
+_AUTODETECT_ORDER = [Protocol.HTTP, Protocol.SOCKS5, Protocol.SOCKS4, Protocol.HTTPS]
+
+
 async def validate_proxy(
     endpoint: Endpoint,
     profile: ValidationProfile,
     validation_endpoints: list[str],
     judge_endpoint: str | None = None,
     real_ip: str | None = None,
+    retries: int = 0,
+    retry_backoff: float = 0.0,
+    protocols: list[Protocol] | None = None,
 ) -> ValidationResult:
-    """Validate a single proxy. Never raises; always returns a result."""
+    """Validate a single proxy. Never raises; always returns a result.
+
+    ``retries``/``retry_backoff`` re-attempt transient failures (never turning a
+    failure into a false WORKING — success still requires a real proxied request
+    returning a valid exit IP). ``protocols``, when given, tries each protocol in
+    order and returns the first that genuinely works, so a mislabeled candidate
+    (e.g. a plain ``IP:PORT`` list) can still be identified.
+    """
+    attempt_protocols = protocols or [endpoint.protocol]
+    last: ValidationResult | None = None
+    for proto in attempt_protocols:
+        candidate_ep = endpoint if proto == endpoint.protocol else _with_protocol(endpoint, proto)
+        res = await _validate_with_retries(
+            candidate_ep, profile, validation_endpoints, judge_endpoint, real_ip,
+            retries, retry_backoff,
+        )
+        if res.status == ValidationStatus.WORKING:
+            return res
+        if res.status == ValidationStatus.AUTH_REQUIRED:
+            # Auth is a definitive answer for this protocol; don't try others.
+            return res
+        last = res
+    return last  # type: ignore[return-value]
+
+
+def _with_protocol(endpoint: Endpoint, protocol: Protocol) -> Endpoint:
+    return Endpoint(
+        host=endpoint.host, port=endpoint.port, protocol=protocol,
+        username=endpoint.username, password=endpoint.password,
+    )
+
+
+async def _validate_with_retries(
+    endpoint: Endpoint,
+    profile: ValidationProfile,
+    validation_endpoints: list[str],
+    judge_endpoint: str | None,
+    real_ip: str | None,
+    retries: int,
+    retry_backoff: float,
+) -> ValidationResult:
+    attempts = max(1, retries + 1)
+    result = ValidationResult(endpoint=endpoint, status=ValidationStatus.FAILED, tested_at=utcnow())
+    for attempt in range(attempts):
+        result = await _validate_single(
+            endpoint, profile, validation_endpoints, judge_endpoint, real_ip
+        )
+        if result.status == ValidationStatus.WORKING:
+            return result
+        if result.status == ValidationStatus.AUTH_REQUIRED:
+            return result
+        if (result.error_category not in _RETRYABLE_CATEGORIES) or attempt == attempts - 1:
+            return result
+        if retry_backoff > 0:
+            await asyncio.sleep(retry_backoff * (2 ** attempt))
+    return result
+
+
+async def _validate_single(
+    endpoint: Endpoint,
+    profile: ValidationProfile,
+    validation_endpoints: list[str],
+    judge_endpoint: str | None = None,
+    real_ip: str | None = None,
+) -> ValidationResult:
+    """Perform one full validation attempt for a fixed endpoint/protocol."""
     result = ValidationResult(endpoint=endpoint, status=ValidationStatus.TESTING, tested_at=utcnow())
     timeout = profile.timeout
 

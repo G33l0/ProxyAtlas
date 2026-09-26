@@ -336,6 +336,7 @@ class ProxiesPage(BasePage):
         worker = ExportWorker(
             self.ctx, self._spec, opts["path"], opts["fmt"],
             working_only=opts["working_only"], txt_format=opts["txt_format"],
+            include_credentials=opts.get("include_credentials", False),
         )
         worker.completed.connect(lambda info: self._export_done(info, worker))
         worker.failed.connect(lambda e: self.toast(f"Export failed: {e}", "error"))
@@ -346,13 +347,15 @@ class ProxiesPage(BasePage):
     def _export_selected_rows(self, opts: dict) -> None:
         from app.services.exporters import export_rows, proxy_to_row
 
+        include_creds = opts.get("include_credentials", False)
+        cipher = self.ctx.cipher if include_creds else None
         rows = self._selected_rows()
         with self.ctx.database.session() as session:
             full = []
             for r in rows:
                 p = repo.get_proxy(session, r["id"])
                 if p:
-                    full.append(proxy_to_row(p))
+                    full.append(proxy_to_row(p, cipher, include_creds))
         try:
             count = export_rows(full, opts["path"], opts["fmt"], opts["working_only"], opts["txt_format"])
             self.toast(f"Exported {count} proxies to {opts['path']}", "success")

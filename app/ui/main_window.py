@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeySequence, QShortcut
 from PyQt6.QtWidgets import (
     QButtonGroup,
@@ -108,6 +108,14 @@ class MainWindow(QMainWindow):
         self.apply_theme(self.theme_manager.palette.name, persist=False)
         self.navigate("dashboard")
 
+        # Background monitoring scheduler: fires due monitoring jobs automatically.
+        self._active_monitor_jobs: set[int] = set()
+        self._monitor_workers: list = []
+        self._monitor_timer = QTimer(self)
+        self._monitor_timer.setInterval(60_000)  # check once a minute
+        self._monitor_timer.timeout.connect(self._tick_monitors)
+        self._monitor_timer.start()
+
     # --- sidebar ------------------------------------------------------------
     def _build_sidebar(self) -> QWidget:
         sidebar = QWidget()
@@ -200,6 +208,46 @@ class MainWindow(QMainWindow):
             self._job_status.setText(f"⏵ {label}: {snapshot.get('progress', 0):.0f}%")
         elif state in ("completed", "failed", "cancelled"):
             self._job_status.setText(f"{label}: {state}")
+
+    # --- background monitoring scheduler -----------------------------------
+    def _tick_monitors(self) -> None:
+        """Run any enabled monitoring jobs that are due, without overlap."""
+        from datetime import datetime, timezone
+
+        from app.database import repository as repo
+        from app.workers.monitoring_worker import MonitoringWorker
+
+        now = datetime.now(timezone.utc)
+        try:
+            with self.ctx.database.session() as session:
+                jobs = repo.list_monitoring_jobs(session)
+                due = []
+                for j in jobs:
+                    if not j.enabled or j.id in self._active_monitor_jobs:
+                        continue
+                    next_run = j.next_run_at
+                    if next_run is not None and next_run.tzinfo is None:
+                        next_run = next_run.replace(tzinfo=timezone.utc)
+                    if next_run is None or next_run <= now:
+                        due.append((j.id, j.target_type, j.target_ref or ""))
+        except Exception:  # noqa: BLE001 - scheduler must never crash the UI
+            return
+
+        for job_id, target_type, target_ref in due:
+            self._active_monitor_jobs.add(job_id)
+            worker = MonitoringWorker(self.ctx, job_id, target_type, target_ref)
+            worker.completed.connect(lambda out, jid=job_id, w=worker: self._monitor_done(jid, w))
+            worker.failed.connect(lambda err, jid=job_id, w=worker: self._monitor_done(jid, w))
+            self._monitor_workers.append(worker)
+            worker.start()
+
+    def _monitor_done(self, job_id: int, worker) -> None:
+        self._active_monitor_jobs.discard(job_id)
+        if worker in self._monitor_workers:
+            self._monitor_workers.remove(worker)
+        page = self.pages.get("monitoring")
+        if page is not None and self.stack.currentWidget() is page:
+            page.refresh()
 
     # --- toast --------------------------------------------------------------
     def toast(self, message: str, level: str = "info") -> None:

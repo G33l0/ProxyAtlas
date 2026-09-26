@@ -77,7 +77,15 @@ async def run_monitor_once(ctx: AppContext, job_id: int, target_type: str, targe
         settings=ctx.testing_settings(),
         intelligence_enabled=False,  # monitoring focuses on availability
     )
-    result = await pipeline.process(candidates, profile)
+    try:
+        result = await pipeline.process(candidates, profile)
+    except Exception as exc:  # noqa: BLE001 - a failed pass must still advance the schedule
+        logger.warning("Monitor job %s failed: %s", job_id, exc)
+        # Record an empty result so next_run_at advances and the scheduler does
+        # not re-fire this job every tick.
+        with ctx.database.session() as session:
+            repo.record_monitoring_result(session, job_id, len(candidates), 0, len(candidates), None)
+        return MonitorOutcome(job_id, len(candidates), 0, len(candidates), None)
 
     avg_latency = None
     if result.stats:

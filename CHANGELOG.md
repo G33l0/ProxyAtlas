@@ -7,6 +7,19 @@ Semantic Versioning.
 ## [Unreleased]
 
 ### Added
+- **Per-proxy retry/backoff** in the validator for transient failures (settings:
+  retries, retry backoff); success still requires a real proxied request.
+- **Protocol auto-detection** (opt-in): tries the candidate's own protocol first
+  and falls back to others only on failure, correcting mislabeled/scheme-less
+  proxies. Zero false positives preserved.
+- **Optional authenticated export** (opt-in, with a plaintext warning): TXT
+  embeds credentials, CSV/JSON gain username/password columns; off by default.
+- **Offline GeoIP (MMDB) provider**: geoip2-backed GeoLite2/DB-IP city+ASN
+  lookups with no network calls or rate limits; graceful skip when absent.
+- **Background monitoring scheduler**: monitoring jobs fire automatically on
+  their interval from within the running app.
+- **Termux / headless support**: `requirements-cli.txt`, a graceful
+  GUI-unavailable message, and `docs/termux.md` install/usage guide.
 - External-drive / custom database storage: point the database at any folder or
   drive (Settings → Database), with a one-click relocate, writability validation
   and graceful fallback to the default location when the drive is unavailable.
