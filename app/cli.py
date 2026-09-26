@@ -153,7 +153,27 @@ def main(argv: list[str] | None = None) -> int:
         print(f"ProxyAtlas {__version__}")
         return 0
 
-    if args.gui or (argv is None and len(sys.argv) == 1):
+    wants_gui = args.gui or (argv is None and len(sys.argv) == 1)
+    if wants_gui:
+        import importlib.util
+
+        if importlib.util.find_spec("PyQt6") is None:
+            # PyQt6 is unavailable (e.g. Termux / headless). Guide the user to the
+            # CLI instead of crashing.
+            print(
+                "The graphical interface requires PyQt6, which is not installed "
+                "in this environment (e.g. Termux/headless).\n"
+                "ProxyAtlas still works headlessly — use the CLI, for example:\n"
+                "  proxyatlas --import proxies.txt\n"
+                "  proxyatlas --validate --profile quick\n"
+                "  proxyatlas --export working.txt --working-only\n"
+                "  proxyatlas --stats\n",
+                file=sys.stderr,
+            )
+            if args.gui:
+                return 2
+            parser.print_help()
+            return 0
         from app.main import main as gui_main
 
         return gui_main()

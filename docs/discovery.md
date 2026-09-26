@@ -45,3 +45,17 @@ merged into `metadata['sources']`.
 
 `app/discovery/scheduler.py` computes which sources/monitors are due based on an
 interval and last-run time; the services layer triggers them.
+
+## Validation tuning (retry & protocol auto-detection)
+
+Two Settings → Testing options improve real-world yield without ever creating
+false positives (a proxy is WORKING only after a genuine proxied request returns
+a valid exit IP):
+
+- **Retries / retry backoff** — transient failures (timeout, connection,
+  protocol, no-exit-IP) are re-attempted with exponential backoff. Authentication
+  failures are terminal and never retried.
+- **Protocol auto-detect** — for scheme-less or mislabeled candidates, the
+  validator tries the candidate's own protocol first and only falls back to the
+  others (HTTP → SOCKS5 → SOCKS4 → HTTPS) if it fails, adopting the protocol that
+  genuinely works.

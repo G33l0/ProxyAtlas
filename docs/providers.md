@@ -52,3 +52,21 @@ the lookup or the validation pipeline.
   environment variables) and are **never hard-coded**.
 - Proxy credentials and stored secrets are encrypted at rest (Fernet).
 - Nothing sensitive is written to logs (redaction filter).
+
+## Offline GeoIP (MMDB)
+
+The `mmdb` provider (`app/intelligence/providers/mmdb.py`) resolves geolocation
+and ASN/ISP from local MaxMind GeoLite2 or DB-IP `.mmdb` files using `geoip2`,
+with **no network calls and no rate limits**. Configure it under
+Settings → Providers:
+
+| Field | Purpose |
+|-------|---------|
+| `city_db` | Path to GeoLite2-City / GeoLite2-Country (or DB-IP) `.mmdb` |
+| `asn_db`  | Path to GeoLite2-ASN (or DB-IP ASN) `.mmdb` |
+| `enabled` | Auto-enabled when a database path is set |
+
+It runs at the highest priority, so when present it answers first and the online
+providers only fill gaps. ProxyAtlas does not bundle these licensed databases;
+download them from MaxMind or DB-IP. If `geoip2` is not installed or no database
+is configured, the provider returns nothing and the pipeline continues.
