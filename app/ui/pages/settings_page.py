@@ -117,7 +117,7 @@ class SettingsPage(BasePage):
         f = self._tab("Testing")
         f.addRow("Timeout (s)", self._dspin("testing.timeout", self._get("testing", "timeout", 12.0), 1, 120))
         f.addRow("Concurrency", self._spin("testing.concurrency", self._get("testing", "concurrency", 40), 1, 500))
-        f.addRow("Retries", self._spin("testing.retries", self._get("testing", "retries", 1), 0, 10))
+        f.addRow("Retries", self._spin("testing.retries", self._get("testing", "retries", 0), 0, 10))
         f.addRow("Retry backoff (s)", self._dspin("testing.retry_backoff", self._get("testing", "retry_backoff", 1.5), 0, 60, 0.5))
         f.addRow("Protocol auto-detect", self._combo("testing.protocol_autodetect", ["true", "false"], str(self._get("testing", "protocol_autodetect", False)).lower()))
         f.addRow("Default profile", self._combo("testing.default_profile", ["quick", "standard", "deep"], self._get("testing", "default_profile", "standard")))

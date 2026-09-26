@@ -149,8 +149,9 @@ def _categorize(exc: Exception) -> tuple[ValidationStatus, str, str]:
     return ValidationStatus.FAILED, "unknown", f"{name}: {exc}"[:300]
 
 
-# Failure categories that are worth retrying (transient); auth is terminal.
-_RETRYABLE_CATEGORIES = {"timeout", "connect", "protocol", "unknown", "http_error", "no_exit_ip", "dns"}
+# Failure categories worth retrying (genuinely transient). A refused connection
+# ("connect") and authentication are definitive, so they are not retried.
+_RETRYABLE_CATEGORIES = {"timeout", "protocol", "unknown", "http_error", "no_exit_ip", "dns"}
 
 # Order tried during protocol auto-detection, after the candidate's own protocol.
 _AUTODETECT_ORDER = [Protocol.HTTP, Protocol.SOCKS5, Protocol.SOCKS4, Protocol.HTTPS]

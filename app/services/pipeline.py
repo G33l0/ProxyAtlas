@@ -114,11 +114,16 @@ class ProcessingPipeline:
                 cand = by_identity.get(res.endpoint.identity)
                 if cand is None:
                     original = by_hostport.get((res.endpoint.host, res.endpoint.port))
-                    # Preserve the original source/credentials but adopt the
-                    # detected protocol from the result endpoint.
+                    # Auto-detection corrected the protocol: adopt the detected
+                    # one, preserve the original source, and remove any stale
+                    # row that still carries the mislabeled protocol so the same
+                    # host:port never appears twice.
                     cand = ProxyCandidate(
                         endpoint=res.endpoint,
                         source=original.source if original else "validation",
+                    )
+                    repo.delete_proxies_at_hostport_except(
+                        session, res.endpoint.host, res.endpoint.port, res.endpoint.protocol.value
                     )
                 proxy = repo.upsert_proxy_from_candidate(session, cand, self.cipher)
                 repo.apply_validation_result(session, proxy, res, profile.name)

@@ -36,7 +36,7 @@ class AppContext:
         return {
             "timeout": section.get("timeout", 12.0),
             "concurrency": section.get("concurrency", 40),
-            "retries": section.get("retries", 1),
+            "retries": section.get("retries", 0),
             "retry_backoff": section.get("retry_backoff", 1.5),
             "protocol_autodetect": section.get("protocol_autodetect", False),
             "validation_endpoints": section.get("validation_endpoints", []),

@@ -96,7 +96,7 @@ def export_txt(
 
 def _columns(rows: list[dict[str, Any]]) -> list[str]:
     """Export columns, extended with credential columns only if rows carry them."""
-    if any(r.get("username") for r in rows):
+    if any(r.get("username") or r.get("password") for r in rows):
         return EXPORT_COLUMNS + CREDENTIAL_COLUMNS
     return EXPORT_COLUMNS
 
@@ -134,10 +134,11 @@ def export_html(
 ) -> int:
     """Write a self-contained HTML table. All values are HTML-escaped."""
     rows = _only_working(list(rows), working_only)
-    head_cells = "".join(f"<th>{html.escape(c)}</th>" for c in EXPORT_COLUMNS)
+    columns = _columns(rows)
+    head_cells = "".join(f"<th>{html.escape(c)}</th>" for c in columns)
     body_rows = []
     for r in rows:
-        cells = "".join(f"<td>{html.escape('' if r.get(c) is None else str(r.get(c)))}</td>" for c in EXPORT_COLUMNS)
+        cells = "".join(f"<td>{html.escape('' if r.get(c) is None else str(r.get(c)))}</td>" for c in columns)
         body_rows.append(f"<tr>{cells}</tr>")
     generated = html.escape(datetime.now(timezone.utc).isoformat(timespec="seconds"))
     doc = f"""<!DOCTYPE html>
